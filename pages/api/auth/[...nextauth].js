@@ -1,10 +1,10 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { getCookie, removeCookies } from "cookies-next";
-const User = require("../../../models/User");
-const Business = require("../../../models/Business");
-const Product = require("../../../models/Product");
-const Order = require("../../../models/Order");
+const User = require("../../../models/user");
+const Business = require("../../../models/business");
+const Product = require("../../../models/product");
+const Order = require("../../../models/order");
 import dbConnect from "../../../db/database";
 
 dbConnect();

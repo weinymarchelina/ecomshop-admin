@@ -11,6 +11,7 @@ import {
   Menu,
   MenuItem,
   Button,
+  Typography,
 } from "@mui/material";
 
 const links = ["Dashboard", "Products", "Orders", "Report", "Settings"];
@@ -28,7 +29,7 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar className="navContainer" position="static">
+    <AppBar className="nav-container" sx={{ px: 2 }} position="static">
       <Container maxWidth="xxl">
         <Toolbar disableGutters>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
@@ -85,17 +86,10 @@ const Navbar = () => {
           </Box>
 
           {session && (
-            <Box
-              className="navLinks"
-              sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}
-            >
+            <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}>
               {links.map((link) => (
-                <Link
-                  href={`/${link.toLowerCase()}`}
-                  key={link}
-                  sx={{ my: 2, color: "white", display: "block" }}
-                >
-                  {link}
+                <Link href={`/${link.toLowerCase()}`} key={link}>
+                  <Typography sx={{ paddingLeft: 2 }}>{link}</Typography>
                 </Link>
               ))}
             </Box>
@@ -105,15 +99,6 @@ const Navbar = () => {
             <Button variant="outlined" color="secondary">
               <Link href="/">Set Roles</Link>
             </Button>
-            // <button
-            //   onClick={() =>
-            //     signIn(null, {
-            //       callbackUrl: `${window.location.origin}/`,
-            //     })
-            //   }
-            // >
-            //   Sign In
-            // </button>
           )}
         </Toolbar>
       </Container>
