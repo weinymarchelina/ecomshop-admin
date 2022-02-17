@@ -68,7 +68,7 @@ const Owner = ({ user }) => {
             >
               Business Form
             </Typography>
-            <form onSubmit={handleSubmit}>
+            <form autoComplete="off" onSubmit={handleSubmit}>
               <FormControl fullWidth>
                 <TextField
                   label="Business's Name"

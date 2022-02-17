@@ -73,7 +73,7 @@ const Employee = ({ user }) => {
               {`Join to your business' account`}{" "}
             </Typography>
 
-            <form onSubmit={handleSubmit}>
+            <form autoComplete="off" onSubmit={handleSubmit}>
               <FormControl fullWidth>
                 <TextField
                   label="Business' Email"
