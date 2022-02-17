@@ -1,6 +1,6 @@
-import dbConnect from "../../db/database";
-import Business from "../../models/business";
-import User from "../../models/user";
+import dbConnect from "../../../db/database";
+import Business from "../../../models/business";
+import User from "../../../models/user";
 import { getSession } from "next-auth/react";
 import bcrypt from "bcrypt";
 

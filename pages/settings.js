@@ -101,9 +101,6 @@ const Settings = ({ user }) => {
 
   const handlePassword = async (e) => {
     e.preventDefault();
-    console.log(oldPassword);
-    console.log(newPassword);
-    console.log(confirmPassword);
 
     if (newPassword !== confirmPassword) {
       setPasswordError(`New password and confirm new password don't match`);
@@ -168,7 +165,7 @@ const Settings = ({ user }) => {
 
   const handleKick = async () => {
     try {
-      await axios.post("/api/settings", {
+      await axios.post("/api/settings/", {
         inputPass: password,
         businessId,
         employeeId: wantKick.userId,
@@ -183,7 +180,7 @@ const Settings = ({ user }) => {
 
   const handleResign = async () => {
     try {
-      await axios.post("/api/settings", {
+      await axios.post("/api/settings/", {
         inputPass: password,
         businessId,
         employeeId: userId,
@@ -198,7 +195,7 @@ const Settings = ({ user }) => {
 
   const handleDeleteAcc = async () => {
     try {
-      await axios.post("/api/delete", {
+      await axios.post("/api/settings/delete", {
         inputPass: password,
         businessId,
       });
@@ -219,7 +216,7 @@ const Settings = ({ user }) => {
     }
 
     try {
-      await axios.post("/api/role", {
+      await axios.post("/api/settings/role", {
         inputPass: password,
         businessId,
         ownerId: user.userId,
@@ -263,7 +260,7 @@ const Settings = ({ user }) => {
 
   const propsResign = {
     ...propsBase,
-    command: `Please input the business' password to
+    command: `Input the business' password to
     resign`,
     action: "Resign",
     handle: handleResign,

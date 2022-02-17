@@ -9,7 +9,7 @@ const Dashboard = ({ user }) => {
 
   useEffect(async () => {
     try {
-      const res = await axios.get("/api/check");
+      const res = await axios.get("/api/data/check");
       const { userStatus } = res.data;
       if (!userStatus) {
         signOut({ callbackUrl: `${window.location.origin}/` });

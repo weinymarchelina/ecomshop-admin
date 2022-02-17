@@ -1,5 +1,5 @@
-import dbConnect from "../../db/database";
-import User from "../../models/user";
+import dbConnect from "../../../db/database";
+import User from "../../../models/user";
 import { getSession } from "next-auth/react";
 
 dbConnect();

@@ -14,8 +14,6 @@ const getBusiness = async (req, res) => {
     const session = await getSession({ req });
     if (!session) return res.status(400).json({ msg: "Please login first." });
 
-    // const { businessId } = req.body;
-
     const { businessId, userId, role } = session.user;
     const business = await Business.findById(businessId);
     const user = await User.findById(userId);
