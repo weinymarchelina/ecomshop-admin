@@ -24,25 +24,35 @@ import PasswordChecker from "../components/PasswordChecker";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ErrorWarning from "../components/ErrorWarning";
 import CheckCircle from "@mui/icons-material/CheckCircle";
+import EditIcon from "@mui/icons-material/Edit";
 
 const Settings = ({ user }) => {
   const { businessId, userId, role } = user;
   const [business, setBusiness] = useState(null);
+
   const [password, setPassword] = useState("");
   const [wantKick, setWantKick] = useState(null);
   const [resign, setResign] = useState(false);
   const [changeRole, setChangeRole] = useState(false);
   const [nextOwner, setNextOwner] = useState(null);
   const [deleteAcc, setDeleteAcc] = useState(false);
+
   const [error, setError] = useState(null);
   const [passwordError, setPasswordError] = useState(null);
+
   const [modal, setModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
   const [successMsg, setSuccessMsg] = useState(null);
   const [promoted, setPromoted] = useState(null);
-  // const [newEmail, setNewEmail] = useState("");
+
   const [newPassword, setNewPassword] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+
   const matches = useMediaQuery("(max-width:720px)");
   const stacks = useMediaQuery("(max-width:450px)");
 
@@ -79,7 +89,17 @@ const Settings = ({ user }) => {
     setSuccessMsg(null);
   };
 
-  const handleEdit = async (e) => {
+  const handleEditClose = () => {
+    setEditModal(false);
+    setError(null);
+    setName("");
+    setPhone("");
+    setEmail("");
+    setPassword("");
+    setSuccessMsg(null);
+  };
+
+  const handlePassword = async (e) => {
     e.preventDefault();
     console.log(oldPassword);
     console.log(newPassword);
@@ -99,12 +119,48 @@ const Settings = ({ user }) => {
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      console.log(res);
       setSuccessMsg(res.data.msg);
-      // console.log(res.response.data.msg);
-      // window.location.reload();
     } catch (err) {
       setPasswordError(err.response?.data.msg);
+
+      return;
+    }
+  };
+
+  const handleEdit = async (e) => {
+    e.preventDefault();
+
+    if (!name && !phone & !email) {
+      setError(`Please input at least one of the fields`);
+      return;
+    } else if (
+      name === business.name &&
+      Number(phone) === business.phone &&
+      email === business.email
+    ) {
+      setError(`New information and old information cannot be the same`);
+      return;
+    }
+
+    const newName = name || business.name;
+    const newPhone = phone || business.phone;
+    const newEmail = email || business.email;
+
+    try {
+      const res = await axios.post("/api/settings/edit", {
+        newName,
+        newPhone,
+        newEmail,
+        password,
+        businessId,
+      });
+      setName("");
+      setPhone("");
+      setEmail("");
+      setPassword("");
+      setSuccessMsg(res.data.msg);
+    } catch (err) {
+      setError(err.response?.data.msg);
 
       return;
     }
@@ -191,7 +247,7 @@ const Settings = ({ user }) => {
   const propsDelete = {
     ...propsBase,
     command:
-      "Please input the company password to delete the whole business account",
+      "Input the business' password to delete the whole business account. Warning: this action is irreversible",
     action: "Delete",
     handle: handleDeleteAcc,
     setState: setDeleteAcc,
@@ -199,7 +255,7 @@ const Settings = ({ user }) => {
 
   const propsKick = {
     ...propsBase,
-    command: `Please input the company password to kick ${wantKick?.name}`,
+    command: `Input the business' password to kick ${wantKick?.name}`,
     action: "Kick",
     handle: handleKick,
     setState: setWantKick,
@@ -207,7 +263,7 @@ const Settings = ({ user }) => {
 
   const propsResign = {
     ...propsBase,
-    command: `Please input the company password to
+    command: `Please input the business' password to
     resign`,
     action: "Resign",
     handle: handleResign,
@@ -362,11 +418,151 @@ const Settings = ({ user }) => {
                 </Typography>
 
                 {role === "Owner" && (
-                  <IconButton color="primary" onClick={() => setModal(true)}>
-                    <SettingsIcon />
-                  </IconButton>
+                  <Box>
+                    <IconButton
+                      color="primary"
+                      onClick={() => {
+                        setEditModal(true);
+                        setChangeRole(false);
+                        setWantKick(null);
+                        setDeleteAcc(false);
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton color="primary" onClick={() => setModal(true)}>
+                      <SettingsIcon />
+                    </IconButton>
+                  </Box>
                 )}
               </Box>
+
+              <Modal open={editModal} onClose={handleEditClose}>
+                <Box sx={modalStyle}>
+                  <Typography
+                    className="main-title"
+                    variant={stacks ? "h6" : "h5"}
+                    component="h2"
+                    sx={{ mb: 3 }}
+                    textAlign="center"
+                  >
+                    Change Business Information
+                  </Typography>
+                  <form autoComplete="off" onSubmit={handleEdit}>
+                    <FormControl fullWidth>
+                      {!successMsg && (
+                        <>
+                          <Typography sx={{ mb: 2 }} textAlign="center">
+                            Input at least one of the fields below in order to
+                            change the information.{" "}
+                          </Typography>
+                          <TextField
+                            label="New Name"
+                            fullWidth
+                            rows={1}
+                            type="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            sx={{ mb: 4 }}
+                            variant="standard"
+                          />
+
+                          <TextField
+                            label="New Phone Number"
+                            fullWidth
+                            rows={1}
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            sx={{ mb: 4 }}
+                            variant="standard"
+                          />
+
+                          <TextField
+                            label="New Email"
+                            fullWidth
+                            rows={1}
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            sx={{ mb: 4 }}
+                            variant="standard"
+                          />
+
+                          <TextField
+                            label="Password"
+                            fullWidth
+                            rows={1}
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            variant="standard"
+                            required
+                          />
+
+                          {error && <ErrorWarning error={error} />}
+                        </>
+                      )}
+
+                      {successMsg && (
+                        <Container className="f-column">
+                          <CheckCircle
+                            color="success"
+                            sx={{ m: 2, fontSize: 100 }}
+                          />
+                          <Typography
+                            color="success.main"
+                            variant="h6"
+                            component="p"
+                            sx={{ width: "20ch" }}
+                            textAlign="center"
+                          >
+                            {successMsg}
+                          </Typography>
+                        </Container>
+                      )}
+
+                      <Box
+                        sx={{
+                          mt: 3,
+                          alignSelf: `${stacks ? "center" : "flex-end"}`,
+                        }}
+                      >
+                        {!successMsg && (
+                          <>
+                            <Button
+                              sx={{ px: 2, py: 1, mr: 1 }}
+                              size="small"
+                              type="submit"
+                              variant="contained"
+                            >
+                              Change
+                            </Button>
+                            <Button
+                              sx={{ px: 2, py: 1 }}
+                              onClick={handleEditClose}
+                              size="small"
+                              variant="outlined"
+                            >
+                              Close
+                            </Button>
+                          </>
+                        )}
+                        {successMsg && (
+                          <Button
+                            sx={{ px: 2, py: 1 }}
+                            onClick={() => window.location.reload()}
+                            size="small"
+                            variant="outlined"
+                          >
+                            Close
+                          </Button>
+                        )}
+                      </Box>
+                    </FormControl>
+                  </form>
+                </Box>
+              </Modal>
 
               <Modal open={modal} onClose={handleClose}>
                 <Box sx={modalStyle}>
@@ -379,22 +575,10 @@ const Settings = ({ user }) => {
                   >
                     Change Business Password
                   </Typography>
-                  <form autoComplete="off" onSubmit={handleEdit}>
+                  <form autoComplete="off" onSubmit={handlePassword}>
                     <FormControl fullWidth>
                       {!successMsg && (
                         <>
-                          {/* <TextField
-                          label="Email"
-                          fullWidth
-                          rows={1}
-                          type="email"
-                          value={newEmail}
-                          onChange={(e) => setNewEmail(e.target.value)}
-                          sx={{ mb: 4 }}
-                          variant="standard"
-                          required
-                        /> */}
-
                           <TextField
                             label="Current Password"
                             fullWidth
@@ -467,7 +651,7 @@ const Settings = ({ user }) => {
                             type="submit"
                             variant="contained"
                           >
-                            Create
+                            Change
                           </Button>
                         )}
                         <Button
@@ -612,7 +796,10 @@ const Settings = ({ user }) => {
                                         <Button
                                           variant="outlined"
                                           size="small"
-                                          onClick={() => setChangeRole(true)}
+                                          onClick={() => {
+                                            setChangeRole(true);
+                                            setWantKick(null);
+                                          }}
                                         >
                                           Change Role
                                         </Button>
@@ -637,7 +824,10 @@ const Settings = ({ user }) => {
                                         <Button
                                           variant="outlined"
                                           size="small"
-                                          onClick={() => setWantKick(member)}
+                                          onClick={() => {
+                                            setWantKick(member);
+                                            setChangeRole(false);
+                                          }}
                                         >
                                           Kick Employee
                                         </Button>
