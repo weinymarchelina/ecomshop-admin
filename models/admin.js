@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
-const UserSchema = new mongoose.Schema(
+const AdminSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      default: "user",
+      default: "admin",
     },
     email: {
       type: String,
@@ -22,6 +22,6 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-let User = mongoose.models?.users || mongoose.model("users", UserSchema);
+let Admin = mongoose.models?.admins || mongoose.model("admins", AdminSchema);
 
-module.exports = User;
+module.exports = Admin;

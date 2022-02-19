@@ -33,9 +33,9 @@ const EmployeeList = (propsRole) => {
             variant="caption"
             component="p"
           >
-            Select the next owner and input the business' password to change
+            {`Select the next owner and input the business' password to change
             your role into Employee. You will need to login again in order to
-            change the role.
+            change the role.`}
           </Typography>
 
           <List>

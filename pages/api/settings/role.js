@@ -1,6 +1,6 @@
 import dbConnect from "../../../db/database";
 import Business from "../../../models/business";
-import User from "../../../models/user";
+import Admin from "../../../models/admin";
 import { getSession } from "next-auth/react";
 import bcrypt from "bcrypt";
 
@@ -40,7 +40,7 @@ const switchRole = async (req, res) => {
         },
       }
     );
-    await User.updateOne(
+    await Admin.updateOne(
       { _id: ownerId },
       {
         role: "Employee",
@@ -55,7 +55,7 @@ const switchRole = async (req, res) => {
         },
       }
     );
-    await User.updateOne(
+    await Admin.updateOne(
       { _id: employeeId },
       {
         role: "Owner",

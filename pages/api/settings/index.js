@@ -1,6 +1,6 @@
 import dbConnect from "../../../db/database";
 import Business from "../../../models/business";
-import User from "../../../models/user";
+import Admin from "../../../models/admin";
 import { getSession } from "next-auth/react";
 import bcrypt from "bcrypt";
 
@@ -39,7 +39,7 @@ const kickEmployee = async (req, res) => {
       }
     );
 
-    await User.findByIdAndDelete(employeeId).then((user) => {
+    await Admin.findByIdAndDelete(employeeId).then((user) => {
       res.status(200).json({
         msg: `You have kicked ${user.name}`,
       });

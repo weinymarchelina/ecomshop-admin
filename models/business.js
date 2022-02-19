@@ -7,8 +7,7 @@ const BusinessSchema = new mongoose.Schema(
     email: String,
     password: String,
     team: Array,
-    productId: String,
-    orderId: String,
+    category: Array,
   },
   { timestamps: true }
 );

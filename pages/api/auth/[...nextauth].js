@@ -1,10 +1,10 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { getCookie, removeCookies } from "cookies-next";
-const User = require("../../../models/user");
+const Admin = require("../../../models/admin");
 const Business = require("../../../models/business");
-const Product = require("../../../models/product");
-const Order = require("../../../models/order");
+// const Product = require("../../../models/product");
+// const Order = require("../../../models/order");
 import dbConnect from "../../../db/database";
 
 dbConnect();
@@ -44,7 +44,7 @@ const createOptions = (req, res) => ({
       }
 
       // checking whether the user is an old or new user
-      const oldUser = await User.findOne({ email: token.email });
+      const oldUser = await Admin.findOne({ email: token.email });
 
       // no businessId means the user is an old user,  user with businessId means they are new user
       if (!oldUser && businessId) {
@@ -66,10 +66,11 @@ const createOptions = (req, res) => ({
 
       if (oldUser.businessId) {
         // getting the businessId back for the old user
-        const { businessId, productId, orderId, _id, role } = oldUser;
+        const { businessId, _id, role } = oldUser;
+        // const { businessId, productId, orderId, _id, role } = oldUser;
         token.businessId = businessId;
-        token.productId = productId;
-        token.orderId = orderId;
+        // token.productId = productId;
+        // token.orderId = orderId;
         token.userId = _id;
         token.role = role;
         removeCookies("status", { req, res });
@@ -82,8 +83,8 @@ const createOptions = (req, res) => ({
     async session({ session, token, user }) {
       session.user.role = token.role;
       session.user.businessId = token.businessId;
-      session.user.productId = token.productId;
-      session.user.orderId = token.orderId;
+      // session.user.productId = token.productId;
+      // session.user.orderId = token.orderId;
       session.user.userId = token.userId;
 
       return session;
@@ -97,7 +98,8 @@ export default async (req, res) => {
 
 const checkInBusiness = async (token, status) => {
   // * CREATE USER
-  const { businessId, productId, orderId, role } = status;
+  const { businessId, role } = status;
+  // const { businessId, productId, orderId, role } = status;
 
   const userData = {
     name: token.name,
@@ -109,10 +111,10 @@ const checkInBusiness = async (token, status) => {
 
   token.role = role;
   token.businessId = businessId;
-  token.productId = productId;
-  token.orderId = orderId;
+  // token.productId = productId;
+  // token.orderId = orderId;
 
-  const user = await new User(userData).save();
+  const user = await new Admin(userData).save();
   token.userId = user._id;
 
   // * ADD USER TO BUSINESS
@@ -145,19 +147,19 @@ const registerBusiness = async (token, status) => {
   };
 
   const business = await new Business(data).save();
-  const product = await new Product({
-    businessId: business._id,
-    product: [],
-  }).save();
-  const order = await new Order({
-    businessId: business._id,
-    order: [],
-  }).save();
+  // const product = await new Product({
+  //   businessId: business._id,
+  //   product: [],
+  // }).save();
+  // const order = await new Order({
+  //   businessId: business._id,
+  //   order: [],
+  // }).save();
 
-  await Business.findByIdAndUpdate(
-    { _id: business._id },
-    { productId: product._id, orderId: order._id }
-  );
+  // await Business.findByIdAndUpdate(
+  //   { _id: business._id },
+  //   { productId: product._id, orderId: order._id }
+  // );
 
   // * CREATE USER
   const userData = {
@@ -168,16 +170,12 @@ const registerBusiness = async (token, status) => {
     businessId: business._id,
   };
 
-  console.log(business);
-  console.log(business.id);
-  console.log(business._id);
-
   token.role = role;
   token.businessId = business.id;
-  token.productId = product.id;
-  token.orderId = order.id;
+  // token.productId = product.id;
+  // token.orderId = order.id;
 
-  const user = await new User(userData).save();
+  const user = await new Admin(userData).save();
   token.userId = user._id;
 
   // * ADD USER TO BUSINESS

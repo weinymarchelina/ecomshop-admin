@@ -2,7 +2,7 @@ import dbConnect from "../../../db/database";
 import Business from "../../../models/business";
 import Product from "../../../models/product";
 import Order from "../../../models/order";
-import User from "../../../models/user";
+import Admin from "../../../models/admin";
 import { getSession } from "next-auth/react";
 import bcrypt from "bcrypt";
 
@@ -31,7 +31,7 @@ const deleteAcc = async (req, res) => {
     await Order.findByIdAndDelete(business.orderId);
 
     business.team.forEach(async (member) => {
-      await User.findByIdAndDelete(member.userId);
+      await Admin.findByIdAndDelete(member.userId);
     });
 
     await Business.findByIdAndDelete(businessId);

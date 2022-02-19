@@ -88,10 +88,8 @@ const Navbar = () => {
           {session && (
             <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}>
               {links.map((link) => (
-                <Typography sx={{ paddingLeft: 2 }}>
-                  <Link href={`/${link.toLowerCase()}`} key={link}>
-                    {link}
-                  </Link>
+                <Typography sx={{ paddingLeft: 2 }} key={link}>
+                  <Link href={`/${link.toLowerCase()}`}>{link}</Link>
                 </Typography>
               ))}
             </Box>

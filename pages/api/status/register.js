@@ -33,54 +33,6 @@ const createBusiness = async (req, res) => {
         businessId: "business is in registering process",
       },
     });
-
-    // const team = [
-    //   {
-    //     name: session.user.name,
-    //     email: session.user.email,
-    //     image: session.user.image,
-    //     userId: session.userId,
-    //     role: "Owner",
-    //   },
-    // ];
-
-    // const data = {
-    //   name,
-    //   phone,
-    //   email,
-    //   password: hashPass,
-    //   team: [],
-    // };
-
-    // // save business
-    // const business = await new Business(data).save();
-
-    // const product = await new Product({
-    //   businessId: business._id,
-    //   product: [],
-    // }).save();
-
-    // const order = await new Order({
-    //   businessId: business._id,
-    //   order: [],
-    // }).save();
-
-    // await Business.findByIdAndUpdate(
-    //   { _id: business._id },
-    //   { productId: product._id, orderId: order._id }
-    // )
-    //   .then(() => {
-    //     res.status(200).json({
-    //       ids: {
-    //         businessId: business._id,
-    //         productId: product._id,
-    //         orderId: order._id,
-    //       },
-    //     });
-    //   })
-    //   .catch((error) => {
-    //     res.status(500).json({ msg: err.message });
-    //   });
   } catch (err) {
     return res.status(500).json({ msg: err.message });
   }

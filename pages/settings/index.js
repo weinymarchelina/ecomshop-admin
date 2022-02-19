@@ -19,10 +19,10 @@ import {
   TextField,
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import EmployeeList from "../components/EmployeeList";
-import PasswordChecker from "../components/PasswordChecker";
+import EmployeeList from "../../components/EmployeeList";
+import PasswordChecker from "../../components/PasswordChecker";
 import SettingsIcon from "@mui/icons-material/Settings";
-import ErrorWarning from "../components/ErrorWarning";
+import ErrorWarning from "../../components/ErrorWarning";
 import CheckCircle from "@mui/icons-material/CheckCircle";
 import EditIcon from "@mui/icons-material/Edit";
 

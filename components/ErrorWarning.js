@@ -6,7 +6,7 @@ const ErrorWarning = ({ error }) => {
       className="f-space"
       sx={{
         p: 2,
-        pl: 1,
+        pl: 0,
         pb: 0,
         alignItems: "center",
       }}
