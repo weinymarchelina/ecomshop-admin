@@ -6,26 +6,21 @@ import {
   Container,
   Typography,
   Button,
-  IconButton,
   TextField,
   FormControl,
   InputLabel,
   Input,
   FormLabel,
-  RadioGroup,
   FormControlLabel,
-  Radio,
   Switch,
   Select,
   MenuItem,
   List,
   ListItem,
   ListItemButton,
-  Grid,
 } from "@mui/material";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import InputAdornment from "@mui/material/InputAdornment";
 import ErrorWarning from "../../components/ErrorWarning";
@@ -34,7 +29,6 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 const AddProduct = ({ user }) => {
   const stacks = useMediaQuery("(max-width:450px)");
   const matches = useMediaQuery("(max-width:720px)");
-  const [product, setProduct] = useState(null);
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [category, setCategory] = useState("");
@@ -44,6 +38,9 @@ const AddProduct = ({ user }) => {
   const [stockQty, setStockQty] = useState("");
   const [priceList, setPriceList] = useState([]);
   const [active, setActive] = useState(true);
+  const [image, setImage] = useState();
+  const [uploadData, setUploadData] = useState("");
+  const [files, setFiles] = useState(null);
   const [categoryList, setCategoryList] = useState(["Casing", "Headset"]);
   const [error, setError] = useState(null);
 
@@ -66,8 +63,43 @@ const AddProduct = ({ user }) => {
     }
   }, []);
 
-  const handleSubmit = () => {
-    //
+  const uploadImage = async (fileInput) => {
+    const formData = new FormData();
+
+    for (const file of fileInput.files) {
+      formData.append("file", file);
+    }
+
+    formData.append("upload_preset", "superoneaccdebest");
+
+    const res = await axios.post(
+      "https://api.cloudinary.com/v1_1/superoneacc/image/upload",
+      formData
+    );
+
+    setImage(res.data.secure_url);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const form = e.currentTarget;
+    const fileInput = Array.from(form.elements).find(
+      ({ name }) => name === "file"
+    );
+    await uploadImage(fileInput);
+
+    const product = {
+      name,
+      category,
+      desc,
+      image,
+      stockQty,
+      warningQty,
+      activeStatus: active,
+      price: priceList,
+    };
+    console.log(product);
   };
 
   const addPrice = () => {
@@ -95,7 +127,16 @@ const AddProduct = ({ user }) => {
     }
   };
 
-  // console.log(formatter.format("12590095"));
+  const handleChange = (event) => {
+    const reader = new FileReader();
+
+    reader.onload = function (onLoadEvent) {
+      setImage(onLoadEvent.target.result);
+      setUploadData(undefined);
+    };
+
+    reader.readAsDataURL(event.target.files[0]);
+  };
 
   return (
     <Container
@@ -190,8 +231,56 @@ const AddProduct = ({ user }) => {
                 sx={{ my: 2 }}
                 variant="standard"
                 rows={3}
-                required
               />
+            </Box>
+
+            <Box
+              className={matches ? "f-col" : "f-space"}
+              sx={{
+                px: `${matches ? "none" : "1rem"}`,
+                py: `${matches ? "none" : "1.5rem"}`,
+                mb: 2,
+                mt: 3,
+              }}
+              style={{
+                border: `${matches ? "none" : "1px solid #ddd"}`,
+                borderRadius: ".5vw",
+              }}
+            >
+              <Box>
+                <InputLabel>Image</InputLabel>
+                <Button
+                  component="label"
+                  variant="contained"
+                  sx={{ mt: 2 }}
+                  size="small"
+                >
+                  Upload Image
+                  <Input
+                    accept="image/*"
+                    type="file"
+                    name="file"
+                    sx={{ display: "none" }}
+                    onChange={(e) => handleChange(e)}
+                    hidden
+                  />
+                </Button>
+              </Box>
+
+              <Box
+                sx={{
+                  width: `${matches ? "100%" : "45%"}`,
+                  // height: `${
+                  //   matches ? "calc(7.5rem + 25vw)" : "calc(10rem + 5vw)"
+                  // }`,
+                  backgroundColor: "#eee",
+                  my: `${matches ? "2rem" : "none"}`,
+                  border: "3px dashed #ddd",
+                  borderRadius: "1vw",
+                }}
+              >
+                {image && <img src={image} alt="Image" />}
+              </Box>
             </Box>
 
             <Box
@@ -214,7 +303,7 @@ const AddProduct = ({ user }) => {
                 variant="standard"
                 required
                 sx={{
-                  py: 2,
+                  my: 2,
                   width: `${matches ? "100%" : "35%"}`,
                 }}
               />
@@ -227,12 +316,12 @@ const AddProduct = ({ user }) => {
                 variant="standard"
                 required
                 sx={{
-                  py: 2,
+                  my: 2,
                   width: `${matches ? "100%" : "35%"}`,
                 }}
               />
 
-              <FormControl sx={{ py: 2 }} className="f-column">
+              <FormControl sx={{ my: 2 }} className="f-column">
                 <FormLabel>Active Status</FormLabel>
                 <FormControlLabel
                   sx={{ m: 0 }}
@@ -257,7 +346,7 @@ const AddProduct = ({ user }) => {
             >
               <FormControl
                 variant="standard"
-                sx={{ width: `${matches ? "100%" : "35%"}`, pb: 3 }}
+                sx={{ width: `${matches ? "100%" : "35%"}`, my: 2 }}
               >
                 <InputLabel>Price</InputLabel>
                 <Input
@@ -276,7 +365,7 @@ const AddProduct = ({ user }) => {
                 value={minOrder}
                 onChange={(e) => setMinOrder(e.target.value)}
                 variant="standard"
-                sx={{ width: `${matches ? "100%" : "35%"}`, pb: 3 }}
+                sx={{ width: `${matches ? "100%" : "35%"}`, my: 2 }}
               />
               <Box
                 sx={{
@@ -290,7 +379,7 @@ const AddProduct = ({ user }) => {
                   onClick={addPrice}
                   variant="outlined"
                   size="small"
-                  sx={{ width: `${stacks ? "100%" : "auto"}` }}
+                  sx={{ width: `${stacks ? "100%" : "auto"}`, mt: 2 }}
                 >
                   Add Price
                 </Button>
@@ -361,22 +450,21 @@ const AddProduct = ({ user }) => {
                 })}
               </List>
             )}
+            <Button
+              sx={{
+                px: 3,
+                py: 1,
+                mt: 5,
+                alignSelf: `${stacks ? "center" : "flex-end"}`,
+                width: `${stacks ? "100%" : "auto"}`,
+              }}
+              size="large"
+              type="submit"
+              variant="contained"
+            >
+              Add
+            </Button>
           </form>
-
-          <Button
-            sx={{
-              px: 3,
-              py: 1,
-              mt: 3,
-              alignSelf: `${stacks ? "center" : "flex-end"}`,
-              width: `${stacks ? "100%" : "auto"}`,
-            }}
-            size="large"
-            type="submit"
-            variant="contained"
-          >
-            Add
-          </Button>
         </CardContent>
       </Card>
     </Container>
@@ -400,31 +488,4 @@ export async function getServerSideProps(context) {
   return {
     props: { user: session.user },
   };
-}
-
-{
-  /* <FormControl required>
-                <FormLabel>Stock Status</FormLabel>
-                <RadioGroup
-                  row
-                  value={stockStatus}
-                  onChange={(e) => setStockStatus(e.target.value)}
-                >
-                  <FormControlLabel
-                    value="safe"
-                    control={<Radio />}
-                    label="Safe"
-                  />
-                  <FormControlLabel
-                    value="little"
-                    control={<Radio />}
-                    label="Little"
-                  />
-                  <FormControlLabel
-                    value="critical"
-                    control={<Radio />}
-                    label="Critical"
-                  />
-                </RadioGroup>
-              </FormControl> */
 }
