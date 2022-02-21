@@ -9,7 +9,7 @@ const ProductSchema = new mongoose.Schema(
     stockQty: String,
     warningQty: String,
     activeStatus: Boolean,
-    price: Object,
+    price: Array,
     businessId: String,
   },
   { timestamps: true }

@@ -38,9 +38,8 @@ const AddProduct = ({ user }) => {
   const [stockQty, setStockQty] = useState("");
   const [priceList, setPriceList] = useState([]);
   const [active, setActive] = useState(true);
-  const [image, setImage] = useState();
+  const [imgPath, setImgPath] = useState();
   const [uploadData, setUploadData] = useState("");
-  const [files, setFiles] = useState(null);
   const [categoryList, setCategoryList] = useState(["Casing", "Headset"]);
   const [error, setError] = useState(null);
 
@@ -63,43 +62,78 @@ const AddProduct = ({ user }) => {
     }
   }, []);
 
-  const uploadImage = async (fileInput) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!imgPath) {
+      setError("Please upload an image");
+      return;
+    }
+
+    const mainPrice = priceList.filter((tag) => tag.minOrder === 1);
+    if (mainPrice.length !== 1) {
+      setError("Please input the base price for one quantity of this product");
+      setMinOrder(1);
+      return;
+    }
+
+    const form = e.currentTarget;
+
+    const fileInput = Array.from(form.elements).find(
+      ({ name }) => name === "file"
+    );
+
     const formData = new FormData();
 
     for (const file of fileInput.files) {
       formData.append("file", file);
+      console.log("Howdy");
     }
 
     formData.append("upload_preset", "superoneaccdebest");
+    console.log("Howdy 2");
 
     const res = await axios.post(
       "https://api.cloudinary.com/v1_1/superoneacc/image/upload",
       formData
     );
 
-    setImage(res.data.secure_url);
-  };
+    console.log("Howdy 3");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const form = e.currentTarget;
-    const fileInput = Array.from(form.elements).find(
-      ({ name }) => name === "file"
-    );
-    await uploadImage(fileInput);
+    const url = await res.data.secure_url;
+    console.log(res.data);
+    console.log(url);
 
     const product = {
       name,
       category,
       desc,
-      image,
+      image: await url,
       stockQty,
       warningQty,
       activeStatus: active,
       price: priceList,
+      businessId: user.businessId,
     };
+
     console.log(product);
+
+    // try {
+    //   const res = await axios.post("/api/products/add", product);
+    //   console.log(res);
+    //   setActive(true);
+    //   setCategory("");
+    //   setDesc("");
+    //   setImgPath("");
+    //   setName("");
+    //   setPrice("");
+    //   setPriceList([]);
+    //   setStockQty("");
+    //   setWarningQty("");
+    // } catch (err) {
+    //   console.log(err.response?.data);
+    //   throw new Error(err.message);
+    // }
   };
 
   const addPrice = () => {
@@ -113,7 +147,7 @@ const AddProduct = ({ user }) => {
       setError("Please input different order quantity");
       return;
     } else if (!parseFloat(price) || !parseFloat(minOrder)) {
-      setError("Please input numbers");
+      setError("Please input valid numbers");
       return;
     } else {
       priceList.push({
@@ -131,11 +165,15 @@ const AddProduct = ({ user }) => {
     const reader = new FileReader();
 
     reader.onload = function (onLoadEvent) {
-      setImage(onLoadEvent.target.result);
+      setImgPath(onLoadEvent.target.result);
       setUploadData(undefined);
     };
 
     reader.readAsDataURL(event.target.files[0]);
+
+    if (error === "Please upload an image") {
+      setError(null);
+    }
   };
 
   return (
@@ -166,7 +204,7 @@ const AddProduct = ({ user }) => {
               Add Product
             </Typography>
           </Box>
-          <form autoComplete="off" onSubmit={handleSubmit}>
+          <form autoComplete="off" className="f-col" onSubmit={handleSubmit}>
             <Box
               className={matches ? "f-col" : "f-space"}
               sx={{
@@ -247,7 +285,7 @@ const AddProduct = ({ user }) => {
                 borderRadius: ".5vw",
               }}
             >
-              <Box>
+              <Box sx={{ mr: 5, flex: 2 }}>
                 <InputLabel>Image</InputLabel>
                 <Button
                   component="label"
@@ -256,11 +294,12 @@ const AddProduct = ({ user }) => {
                   size="small"
                 >
                   Upload Image
-                  <Input
+                  <input
                     accept="image/*"
+                    multiple
                     type="file"
                     name="file"
-                    sx={{ display: "none" }}
+                    style={{ display: "none" }}
                     onChange={(e) => handleChange(e)}
                     hidden
                   />
@@ -269,17 +308,26 @@ const AddProduct = ({ user }) => {
 
               <Box
                 sx={{
-                  width: `${matches ? "100%" : "45%"}`,
-                  // height: `${
-                  //   matches ? "calc(7.5rem + 25vw)" : "calc(10rem + 5vw)"
-                  // }`,
+                  flex: 1.5,
+                  width: "100%",
                   backgroundColor: "#eee",
                   my: `${matches ? "2rem" : "none"}`,
-                  border: "3px dashed #ddd",
+                  border: "3px dashed #ccc",
                   borderRadius: "1vw",
                 }}
               >
-                {image && <img src={image} alt="Image" />}
+                {imgPath && (
+                  <img
+                    src={imgPath}
+                    alt="Image"
+                    style={{ borderRadius: "1vw", height: "100%" }}
+                  />
+                )}
+                {uploadData && (
+                  <code>
+                    <pre>{JSON.stringify(uploadData, null, 2)}</pre>
+                  </code>
+                )}
               </Box>
             </Box>
 
