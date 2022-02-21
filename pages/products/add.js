@@ -18,10 +18,14 @@ import {
   List,
   ListItem,
   ListItemButton,
+  Grid,
+  IconButton,
 } from "@mui/material";
 import axios from "axios";
+import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import DeleteIcon from "@mui/icons-material/Delete";
 import InputAdornment from "@mui/material/InputAdornment";
 import ErrorWarning from "../../components/ErrorWarning";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -38,10 +42,13 @@ const AddProduct = ({ user }) => {
   const [stockQty, setStockQty] = useState("");
   const [priceList, setPriceList] = useState([]);
   const [active, setActive] = useState(true);
-  const [imgPath, setImgPath] = useState();
+  const [imgPath, setImgPath] = useState([]);
   const [uploadData, setUploadData] = useState("");
   const [categoryList, setCategoryList] = useState(["Casing", "Headset"]);
+  const [imgError, setImgError] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(null);
+  const router = useRouter();
 
   const formatter = new Intl.NumberFormat("id", {
     style: "currency",
@@ -60,13 +67,13 @@ const AddProduct = ({ user }) => {
       console.log(err.message);
       throw new Error(err.message);
     }
-  }, []);
+  }, [imgPath]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!imgPath) {
-      setError("Please upload an image");
+    if (imgPath.length === 0) {
+      setImgError("Please upload an image");
       return;
     }
 
@@ -77,63 +84,55 @@ const AddProduct = ({ user }) => {
       return;
     }
 
-    const form = e.currentTarget;
+    const imgLinks = imgPath.map(async (imgObj) => {
+      const formData = new FormData();
+      formData.append("file", imgObj.file);
+      formData.append("upload_preset", "superoneaccdebest");
 
-    const fileInput = Array.from(form.elements).find(
-      ({ name }) => name === "file"
-    );
+      const res = await axios.post(
+        "https://api.cloudinary.com/v1_1/superoneacc/image/upload",
+        formData
+      );
 
-    const formData = new FormData();
+      console.log("Howdy 3");
 
-    for (const file of fileInput.files) {
-      formData.append("file", file);
-      console.log("Howdy");
-    }
+      return await res.data.secure_url;
+    });
 
-    formData.append("upload_preset", "superoneaccdebest");
-    console.log("Howdy 2");
+    axios.all(imgLinks).then(async (image) => {
+      console.log(image);
+      const product = {
+        name,
+        category,
+        desc,
+        image,
+        stockQty,
+        warningQty,
+        activeStatus: active,
+        price: priceList,
+        businessId: user.businessId,
+      };
 
-    const res = await axios.post(
-      "https://api.cloudinary.com/v1_1/superoneacc/image/upload",
-      formData
-    );
+      console.log(product);
 
-    console.log("Howdy 3");
+      try {
+        await axios.post("/api/products/add", product);
+        setActive(true);
+        setCategory("");
+        setDesc("");
+        setImgPath("");
+        setName("");
+        setPrice("");
+        setPriceList([]);
+        setStockQty("");
+        setWarningQty("");
 
-    const url = await res.data.secure_url;
-    console.log(res.data);
-    console.log(url);
-
-    const product = {
-      name,
-      category,
-      desc,
-      image: await url,
-      stockQty,
-      warningQty,
-      activeStatus: active,
-      price: priceList,
-      businessId: user.businessId,
-    };
-
-    console.log(product);
-
-    // try {
-    //   const res = await axios.post("/api/products/add", product);
-    //   console.log(res);
-    //   setActive(true);
-    //   setCategory("");
-    //   setDesc("");
-    //   setImgPath("");
-    //   setName("");
-    //   setPrice("");
-    //   setPriceList([]);
-    //   setStockQty("");
-    //   setWarningQty("");
-    // } catch (err) {
-    //   console.log(err.response?.data);
-    //   throw new Error(err.message);
-    // }
+        router.push("/products");
+      } catch (err) {
+        console.log(err.response?.data);
+        throw new Error(err.message);
+      }
+    });
   };
 
   const addPrice = () => {
@@ -161,19 +160,48 @@ const AddProduct = ({ user }) => {
     }
   };
 
-  const handleChange = (event) => {
-    const reader = new FileReader();
+  const handleDelete = (selectedImg) => {
+    const newImgList = imgPath.filter(
+      (eachPath) => eachPath.uid !== selectedImg.uid
+    );
+    setImgPath(newImgList);
 
-    reader.onload = function (onLoadEvent) {
-      setImgPath(onLoadEvent.target.result);
-      setUploadData(undefined);
-    };
-
-    reader.readAsDataURL(event.target.files[0]);
-
-    if (error === "Please upload an image") {
-      setError(null);
+    if (imgPath.length <= 7) {
+      setImgError(null);
     }
+  };
+
+  const handleChange = (event) => {
+    console.log(event.target.files);
+
+    const counter = imgPath.length;
+
+    for (const file of event.target.files) {
+      console.log(file);
+      counter++;
+      if (counter > 6) {
+        setImgError("You can only upload maximum 6 images");
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = function (onLoadEvent) {
+        setImgPath((prevPaths) => [
+          ...prevPaths,
+          {
+            path: onLoadEvent.target.result,
+            file,
+            uid: `${file.lastModified}${Math.random()}${file.size}`,
+          },
+        ]);
+        setUploadData(undefined);
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    setImgError(null);
   };
 
   return (
@@ -273,7 +301,7 @@ const AddProduct = ({ user }) => {
             </Box>
 
             <Box
-              className={matches ? "f-col" : "f-space"}
+              className="f-col"
               sx={{
                 px: `${matches ? "none" : "1rem"}`,
                 py: `${matches ? "none" : "1.5rem"}`,
@@ -285,12 +313,12 @@ const AddProduct = ({ user }) => {
                 borderRadius: ".5vw",
               }}
             >
-              <Box sx={{ mr: 5, flex: 2 }}>
+              <Box sx={{ mr: 5 }}>
                 <InputLabel>Image</InputLabel>
                 <Button
                   component="label"
                   variant="contained"
-                  sx={{ mt: 2 }}
+                  sx={{ my: 2 }}
                   size="small"
                 >
                   Upload Image
@@ -306,29 +334,78 @@ const AddProduct = ({ user }) => {
                 </Button>
               </Box>
 
-              <Box
-                sx={{
-                  flex: 1.5,
-                  width: "100%",
-                  backgroundColor: "#eee",
-                  my: `${matches ? "2rem" : "none"}`,
-                  border: "3px dashed #ccc",
-                  borderRadius: "1vw",
-                }}
-              >
-                {imgPath && (
-                  <img
-                    src={imgPath}
-                    alt="Image"
-                    style={{ borderRadius: "1vw", height: "100%" }}
-                  />
-                )}
-                {uploadData && (
-                  <code>
-                    <pre>{JSON.stringify(uploadData, null, 2)}</pre>
-                  </code>
-                )}
-              </Box>
+              {imgError && (
+                <Box
+                  sx={{ px: 2, pb: 2 }}
+                  style={{
+                    border: "1px solid #e57373",
+                    borderRadius: ".5vw",
+                    marginTop: `${matches ? "1rem" : "0"}`,
+                  }}
+                >
+                  <ErrorWarning error={imgError} />
+                </Box>
+              )}
+
+              {imgPath.length > 0 && (
+                <Grid
+                  container
+                  sx={{
+                    width: "100%",
+                    mt: 3,
+                    py: 0,
+                  }}
+                  spacing={1}
+                >
+                  {imgPath.map((pathItem, index) => (
+                    <Grid
+                      item
+                      xs={12}
+                      sm={6}
+                      md={4}
+                      key={pathItem.uid}
+                      sx={{ position: "relative" }}
+                    >
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          py: 0.9,
+                          px: 0.65,
+                          m: 1,
+                          backgroundColor: "#eeeeee90",
+                          borderRadius: "50%",
+                          fontWeight: "bold",
+                          fontSize: "0.55rem",
+                          letterSpacing: "1.5px",
+                        }}
+                      >
+                        {index + 1}/{imgPath.length}
+                      </Box>
+                      <IconButton
+                        onClick={() => handleDelete(pathItem)}
+                        sx={{
+                          position: "absolute",
+                          right: 0,
+                          mt: 0.25,
+                          letterSpacing: "1.5px",
+                        }}
+                      >
+                        <DeleteIcon color="primary" />
+                      </IconButton>
+                      <img
+                        src={pathItem.path}
+                        alt="Image"
+                        style={{ height: "100%" }}
+                      />
+                    </Grid>
+                  ))}
+                  {uploadData && (
+                    <code>
+                      <pre>{JSON.stringify(uploadData, null, 2)}</pre>
+                    </code>
+                  )}
+                </Grid>
+              )}
             </Box>
 
             <Box
