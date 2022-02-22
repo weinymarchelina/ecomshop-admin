@@ -29,6 +29,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import InputAdornment from "@mui/material/InputAdornment";
 import ErrorWarning from "../../components/ErrorWarning";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import LoadingModal from "../../components/LoadingModal";
 
 const AddProduct = ({ user }) => {
   const stacks = useMediaQuery("(max-width:450px)");
@@ -47,7 +48,7 @@ const AddProduct = ({ user }) => {
   const [categoryList, setCategoryList] = useState(["Casing", "Headset"]);
   const [imgError, setImgError] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const formatter = new Intl.NumberFormat("id", {
@@ -64,7 +65,7 @@ const AddProduct = ({ user }) => {
         signOut({ callbackUrl: `${window.location.origin}/` });
       }
     } catch (err) {
-      console.log(err.message);
+      console.log(err.response?.data.msg);
       throw new Error(err.message);
     }
   }, [imgPath]);
@@ -83,6 +84,8 @@ const AddProduct = ({ user }) => {
       setMinOrder(1);
       return;
     }
+
+    setLoading(true);
 
     const imgLinks = imgPath.map(async (imgObj) => {
       const formData = new FormData();
@@ -126,6 +129,8 @@ const AddProduct = ({ user }) => {
         setPriceList([]);
         setStockQty("");
         setWarningQty("");
+
+        setLoading(false);
 
         router.push("/products");
       } catch (err) {
@@ -232,6 +237,7 @@ const AddProduct = ({ user }) => {
               Add Product
             </Typography>
           </Box>
+          <LoadingModal loading={loading} />
           <form autoComplete="off" className="f-col" onSubmit={handleSubmit}>
             <Box
               className={matches ? "f-col" : "f-space"}

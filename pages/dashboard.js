@@ -15,7 +15,7 @@ const Dashboard = ({ user }) => {
         signOut({ callbackUrl: `${window.location.origin}/` });
       }
     } catch (err) {
-      console.log(err.message);
+      console.log(err.response?.data.msg);
       throw new Error(err.message);
     }
   }, []);

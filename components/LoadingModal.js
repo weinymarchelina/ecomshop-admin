@@ -1,12 +1,13 @@
-import { Modal, Typography } from "@mui/material";
-import { Box } from "@mui/system";
+import { Modal, Typography, Box } from "@mui/material";
+import PublishIcon from "@mui/icons-material/Publish";
 
 const LoadingModal = ({ loading }) => {
   const modalStyle = {
     position: "absolute",
     top: "50%",
     left: "50%",
-    width: `${matches ? "95vw" : "calc(28rem + 35vw)"}`,
+    width: "95vw",
+    maxWidth: "calc(25rem + 30vw)",
     transform: "translate(-50%, -50%)",
     bgcolor: "background.paper",
     boxShadow: 24,
@@ -15,9 +16,17 @@ const LoadingModal = ({ loading }) => {
   };
 
   return (
-    <Modal open={loading} onClose={!loading}>
+    <Modal
+      open={loading}
+      onClose={() => {
+        !loading;
+      }}
+    >
       <Box sx={modalStyle} className="f-column">
-        <Typography>Loading...</Typography>
+        <Typography variant="h5" component="p" textAlign={"center"}>
+          Uploading Product...
+        </Typography>
+        <PublishIcon sx={{ fontSize: 60, my: 3 }} className="shake-vertical" />
       </Box>
     </Modal>
   );
