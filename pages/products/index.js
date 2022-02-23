@@ -14,6 +14,8 @@ import {
   Select,
   InputLabel,
   MenuItem,
+  Modal,
+  Button,
 } from "@mui/material";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import axios from "axios";
@@ -22,6 +24,19 @@ import { useState, useEffect } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  width: "95vw",
+  maxWidth: "calc(25rem + 30vw)",
+  transform: "translate(-50%, -50%)",
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 5,
+  mr: 1,
+};
 
 const styleDecide = (product) => {
   if (!product.activeStatus || product.stockQty === "0") {
@@ -35,20 +50,32 @@ const styleDecide = (product) => {
   }
 };
 
+const textDecide = (product) => {
+  if (!product.activeStatus) {
+    return "Inactive";
+  } else if (product.stockQty === "0") {
+    return "Out of Stock";
+  } else if (product.stockQty < product.warningQty) {
+    return "Low Stock";
+  }
+};
+
 const Product = ({ user }) => {
   const matches = useMediaQuery("(max-width:720px)");
   const [products, setProducts] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [categoryList, setCategoryList] = useState(["Casing"]);
-  const [sortType, setSortType] = useState("Alphabetical");
-  const [sortList, setSortList] = useState([
-    "Alphabetical",
+  const [categoryList, setCategoryList] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState([]);
+  const [sortType, setSortType] = useState("Default");
+  const [open, setOpen] = useState(false);
+  const sortList = [
+    "Default",
     "Lowest Price",
     "Highest Price",
     "Lowest Quantity",
     "Highest Quantity",
-  ]);
+  ];
 
   const formatter = new Intl.NumberFormat("id", {
     style: "currency",
@@ -60,44 +87,24 @@ const Product = ({ user }) => {
     minimumFractionDigits: 0,
   });
 
-  const textDecide = (product) => {
-    if (product.stockQty === "0") {
-      return "Out of Stock";
-    } else if (product.stockQty < product.warningQty) {
-      return "Low Stock";
-    } else {
-      return "Inactive";
-    }
-  };
-
   useEffect(async () => {
     try {
       const res = await axios.get("/api/products/");
-      const { productData, userStatus } = res.data;
+      const { productData, userStatus, businessCategory } = res.data;
       if (!userStatus) {
         signOut({ callbackUrl: `${window.location.origin}/` });
       }
-
-      const sorted = productData
-        .sort((a, b) => {
-          const textA = a.name.toUpperCase();
-          const textB = b.name.toUpperCase();
-          return textA < textB ? -1 : textA > textB ? 1 : 0;
-        })
-        .sort(
-          (a, b) => (b.stockQty > b.warningQty) - (a.stockQty > a.warningQty)
-        )
-        .sort((a, b) => b.activeStatus - a.activeStatus);
-
-      setProducts(sorted);
+      setCategoryList(businessCategory);
+      setProducts(productData);
     } catch (err) {
       console.log(err.message);
+      console.log(err.response?.data);
+
       throw new Error(err.message);
     }
   }, []);
 
   const categoryProducts = () => {
-    console.log(products);
     if (selectedCategory === "All") return products;
     else if (selectedCategory !== "All")
       return products.filter(
@@ -117,12 +124,67 @@ const Product = ({ user }) => {
 
   const filteredProducts = filterProducts();
 
+  const sortProducts = () => {
+    let sortedProducts;
+    if (filteredProducts) {
+      switch (sortType) {
+        case "Lowest Price":
+          sortedProducts = filteredProducts.sort(
+            (a, b) => a.price[0].price - b.price[0].price
+          );
+
+          break;
+
+        case "Highest Price":
+          sortedProducts = filteredProducts.sort(
+            (a, b) => b.price[0].price - a.price[0].price
+          );
+
+          break;
+
+        case "Lowest Quantity":
+          sortedProducts = filteredProducts.sort(
+            (a, b) => a.stockQty - b.stockQty
+          );
+          break;
+
+        case "Highest Quantity":
+          sortedProducts = filteredProducts.sort(
+            (a, b) => b.stockQty - a.stockQty
+          );
+
+          break;
+
+        default:
+          sortedProducts = filteredProducts
+            .sort((a, b) => {
+              const textA = a.name.toUpperCase();
+              const textB = b.name.toUpperCase();
+              return textA < textB ? -1 : textA > textB ? 1 : 0;
+            })
+            .sort(
+              (a, b) =>
+                (b.stockQty > b.warningQty) - (a.stockQty > a.warningQty)
+            )
+            .sort((a, b) => (b.stockQty !== "0") - (a.stockQty !== "0"))
+            .sort((a, b) => b.activeStatus - a.activeStatus);
+
+          break;
+      }
+    } else {
+      sortedProducts = products;
+    }
+
+    return sortedProducts;
+  };
+  const finalProducts = sortProducts();
+
   const handleDelete = (product) => {
-    // pop modal to confirm - show basic data
     // agree? then fetch delete
+    console.log("Deleted");
   };
   const handleEdit = (product) => {
-    // bring user to edit.js
+    //set cookies by saving the product._id
   };
 
   return (
@@ -155,7 +217,7 @@ const Product = ({ user }) => {
               </Box>
             </Box>
 
-            {filteredProducts && (
+            {finalProducts && (
               <>
                 <Card variant="outlined">
                   <CardContent
@@ -204,9 +266,42 @@ const Product = ({ user }) => {
                       label="Search"
                       variant="standard"
                       sx={{ flex: 2, pt: 0.65 }}
+                      autoComplete="off"
                     />
                   </CardContent>
                 </Card>
+                {open && (
+                  <Modal open={open} onClose={() => setOpen(false)}>
+                    <Box sx={modalStyle} className="f-column">
+                      <Typography variant="h6" component="p">
+                        Are you sure to delete {selectedProduct.name}?
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        component="p"
+                        color="primary"
+                      >
+                        Warning: this action is irreversible!
+                      </Typography>
+                      <Box sx={{ my: 2 }}>
+                        <Button
+                          variant="outlined"
+                          sx={{ mr: 1 }}
+                          onClick={handleDelete}
+                        >
+                          Delete
+                        </Button>
+                        <Button
+                          variant="contained"
+                          sx={{ ml: 1 }}
+                          onClick={() => setOpen(false)}
+                        >
+                          Cancel
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Modal>
+                )}
                 <Grid container spacing={3} sx={{ my: 1 }}>
                   {filteredProducts.map((product) => {
                     return (
@@ -244,7 +339,9 @@ const Product = ({ user }) => {
                                     backgroundColor: "#eeeeee90",
                                     mr: 1,
                                   }}
-                                  onClick={() => handleDelete(product)}
+                                  onClick={() => {
+                                    setSelectedProduct(product), setOpen(true);
+                                  }}
                                 >
                                   <DeleteIcon
                                     sx={{

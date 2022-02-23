@@ -1,5 +1,6 @@
 import dbConnect from "../../../db/database";
 import Admin from "../../../models/admin";
+import Business from "../../../models/business";
 import Product from "../../../models/product";
 import { getSession } from "next-auth/react";
 
@@ -24,9 +25,11 @@ const getProduct = async (req, res) => {
       });
     }
 
+    const business = await Business.findById(businessId);
     const product = await Product.find({ businessId });
 
     res.status(200).json({
+      businessCategory: business.category,
       productData: product,
       userStatus: true,
     });
