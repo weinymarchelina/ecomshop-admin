@@ -56,6 +56,9 @@ const AddProduct = ({ user }) => {
     currency: "IDR",
     minimumFractionDigits: 0,
   });
+  const qtyFormatter = new Intl.NumberFormat("id", {
+    minimumFractionDigits: 0,
+  });
 
   useEffect(async () => {
     try {
@@ -561,7 +564,8 @@ const AddProduct = ({ user }) => {
                           letterSpacing: `${matches ? "0" : "1px"}`,
                         }}
                       >
-                        {formatter.format(list.price)} for {list.minOrder} pcs
+                        {formatter.format(list.price)} for{" "}
+                        {qtyFormatter.format(list.minOrder)} pcs
                       </Typography>
                       <ListItemButton
                         sx={{ px: 1, flex: 1 }}
