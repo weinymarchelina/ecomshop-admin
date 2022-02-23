@@ -24,6 +24,7 @@ import { useState, useEffect } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import { useRouter } from "next/router";
 
 const modalStyle = {
   position: "absolute",
@@ -69,6 +70,8 @@ const Product = ({ user }) => {
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [sortType, setSortType] = useState("Default");
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+
   const sortList = [
     "Default",
     "Lowest Price",
@@ -179,12 +182,22 @@ const Product = ({ user }) => {
   };
   const finalProducts = sortProducts();
 
-  const handleDelete = (product) => {
-    // agree? then fetch delete
-    console.log("Deleted");
+  const handleDelete = async () => {
+    try {
+      await axios.post("/api/products/delete", {
+        selectedProduct,
+      });
+
+      window.location.reload();
+    } catch (err) {
+      setError(err.response.data.msg);
+      return;
+    }
   };
   const handleEdit = (product) => {
     //set cookies by saving the product._id
+
+    router.push(`/products/edit/${product._id}`);
   };
 
   return (
@@ -219,86 +232,118 @@ const Product = ({ user }) => {
 
             {finalProducts && (
               <>
-                <Card variant="outlined">
+                <Card variant="outlined" sx={{ mt: 2 }}>
                   <CardContent
-                    className="f-space"
+                    className={`${matches ? "f-col" : "f-space"}`}
                     sx={{ alignItems: "center", py: 3, gap: 3 }}
                   >
-                    <FormControl variant="standard" sx={{ flex: 1 }}>
-                      <InputLabel>Filter</InputLabel>
-                      <Select
-                        value={selectedCategory}
-                        label="Category"
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                      >
-                        <MenuItem value="All">
-                          <Typography variant="subtitle1" component="p">
-                            All
-                          </Typography>
-                        </MenuItem>
-                        {categoryList.map((category) => (
-                          <MenuItem key={category} value={category}>
+                    <Box
+                      className="f-space"
+                      sx={{ flex: 2, gap: 3, width: "100%" }}
+                    >
+                      <FormControl variant="standard" sx={{ flex: 1 }}>
+                        <InputLabel>Filter</InputLabel>
+                        <Select
+                          value={selectedCategory}
+                          label="Category"
+                          onChange={(e) => setSelectedCategory(e.target.value)}
+                        >
+                          <MenuItem value="All">
                             <Typography variant="subtitle1" component="p">
-                              {category}
+                              All
                             </Typography>
                           </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                    <FormControl variant="standard" sx={{ flex: 1 }}>
-                      <InputLabel>Sort</InputLabel>
-                      <Select
-                        value={sortType}
-                        label="Sort"
-                        onChange={(e) => setSortType(e.target.value)}
-                      >
-                        {sortList.map((type) => (
-                          <MenuItem key={type} value={type}>
-                            <Typography variant="subtitle1" component="p">
-                              {type}
-                            </Typography>
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+                          {categoryList.map((category) => (
+                            <MenuItem key={category} value={category}>
+                              <Typography variant="subtitle1" component="p">
+                                {category}
+                              </Typography>
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                      <FormControl variant="standard" sx={{ flex: 1 }}>
+                        <InputLabel>Sort</InputLabel>
+                        <Select
+                          value={sortType}
+                          label="Sort"
+                          onChange={(e) => setSortType(e.target.value)}
+                        >
+                          {sortList.map((type) => (
+                            <MenuItem key={type} value={type}>
+                              <Typography variant="subtitle1" component="p">
+                                {type}
+                              </Typography>
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
                     <TextField
                       onChange={(e) => setSearchTerm(e.target.value)}
                       label="Search"
                       variant="standard"
                       sx={{ flex: 2, pt: 0.65 }}
                       autoComplete="off"
+                      fullWidth
                     />
                   </CardContent>
                 </Card>
                 {open && (
                   <Modal open={open} onClose={() => setOpen(false)}>
-                    <Box sx={modalStyle} className="f-column">
-                      <Typography variant="h6" component="p">
-                        Are you sure to delete {selectedProduct.name}?
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        component="p"
-                        color="primary"
-                      >
-                        Warning: this action is irreversible!
-                      </Typography>
-                      <Box sx={{ my: 2 }}>
-                        <Button
-                          variant="outlined"
-                          sx={{ mr: 1 }}
-                          onClick={handleDelete}
-                        >
-                          Delete
-                        </Button>
-                        <Button
-                          variant="contained"
-                          sx={{ ml: 1 }}
-                          onClick={() => setOpen(false)}
-                        >
-                          Cancel
-                        </Button>
-                      </Box>
+                    <Box sx={modalStyle}>
+                      {selectedProduct.activeStatus && (
+                        <Box className="f-column">
+                          <Typography variant="h6" component="p">
+                            Please deactive {selectedProduct.name} before
+                            deleting it
+                          </Typography>
+                          <Typography
+                            variant="subtitle1"
+                            component="p"
+                            sx={{ my: 3 }}
+                          >
+                            Edit the active status first
+                          </Typography>
+                          <Button
+                            variant="contained"
+                            onClick={() => setOpen(false)}
+                          >
+                            Close
+                          </Button>
+                        </Box>
+                      )}
+                      {!selectedProduct.activeStatus && (
+                        <Box className="f-column">
+                          <Typography variant="h6" component="p">
+                            Are you sure to delete {selectedProduct.name}?
+                          </Typography>
+                          <Typography
+                            variant="subtitle1"
+                            component="p"
+                            color="primary"
+                            sx={{ my: 3 }}
+                          >
+                            Warning: this action is irreversible!
+                          </Typography>
+                          <Box sx={{ my: 2 }}>
+                            <Button
+                              variant="outlined"
+                              sx={{ mr: 1 }}
+                              onClick={handleDelete}
+                            >
+                              Delete
+                            </Button>
+                            <Button
+                              variant="contained"
+                              sx={{ ml: 1 }}
+                              onClick={() => setOpen(false)}
+                            >
+                              Cancel
+                            </Button>
+                          </Box>
+                        </Box>
+                      )}
                     </Box>
                   </Modal>
                 )}
