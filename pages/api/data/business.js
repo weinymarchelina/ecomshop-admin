@@ -20,6 +20,7 @@ const getBusiness = async (req, res) => {
 
     if (!user) {
       return res.status(200).json({
+        userStatus: false,
         business: null,
         promoted: null,
       });
@@ -29,12 +30,14 @@ const getBusiness = async (req, res) => {
       return res.status(200).json({
         business,
         promoted: true,
+        userStatus: true,
       });
     }
 
     res.status(200).json({
       business,
       promoted: false,
+      userStatus: true,
     });
   } catch (err) {
     return res.status(500).json(err);

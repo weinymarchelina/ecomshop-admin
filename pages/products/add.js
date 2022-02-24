@@ -45,7 +45,7 @@ const AddProduct = ({ user }) => {
   const [active, setActive] = useState(true);
   const [imgPath, setImgPath] = useState([]);
   const [uploadData, setUploadData] = useState("");
-  const [categoryList, setCategoryList] = useState(["Casing", "Headset"]);
+  const [categoryList, setCategoryList] = useState([]);
   const [imgError, setImgError] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -63,10 +63,12 @@ const AddProduct = ({ user }) => {
   useEffect(async () => {
     try {
       const res = await axios.get("/api/data/check");
-      const { userStatus } = res.data;
+      const { userStatus, business } = res.data;
       if (!userStatus) {
         signOut({ callbackUrl: `${window.location.origin}/` });
       }
+
+      setCategoryList(business.category);
     } catch (err) {
       console.log(err.response?.data.msg);
       throw new Error(err.message);
@@ -277,8 +279,8 @@ const AddProduct = ({ user }) => {
                 >
                   {categoryList.map((item) => {
                     return (
-                      <MenuItem value={item} key={item}>
-                        {item}
+                      <MenuItem value={item} key={item._id}>
+                        {item.name}
                       </MenuItem>
                     );
                   })}
@@ -433,7 +435,7 @@ const AddProduct = ({ user }) => {
                 label="Stock Quantity"
                 type="number"
                 value={stockQty}
-                onChange={(e) => setStockQty(e.target.value)}
+                onChange={(e) => setStockQty(Number(e.target.value))}
                 variant="standard"
                 required
                 sx={{
@@ -446,7 +448,7 @@ const AddProduct = ({ user }) => {
                 label="Stock Warning Quantity"
                 type="number"
                 value={warningQty}
-                onChange={(e) => setWarningQty(e.target.value)}
+                onChange={(e) => setWarningQty(Number(e.target.value))}
                 variant="standard"
                 required
                 sx={{

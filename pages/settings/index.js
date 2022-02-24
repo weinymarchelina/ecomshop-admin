@@ -71,7 +71,11 @@ const Settings = ({ user }) => {
   useEffect(async () => {
     try {
       const res = await axios.get("/api/data/business");
-      const { business: businessData, promoted } = res.data;
+      const { business: businessData, promoted, userStatus } = res.data;
+      if (!userStatus) {
+        signOut({ callbackUrl: `${window.location.origin}/` });
+      }
+
       setBusiness(businessData);
       setPromoted(promoted);
     } catch (err) {

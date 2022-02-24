@@ -50,7 +50,7 @@ const EditProduct = ({ user }) => {
   const [active, setActive] = useState(true);
   const [imgPath, setImgPath] = useState([]);
   const [uploadData, setUploadData] = useState("");
-  const [categoryList, setCategoryList] = useState(["Casing", "Headset"]);
+  const [categoryList, setCategoryList] = useState([]);
   const [imgError, setImgError] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -61,19 +61,25 @@ const EditProduct = ({ user }) => {
         productId: id,
       });
 
-      const { userStatus, product: productData } = res.data;
+      const { userStatus, product: productData, allCategory } = res.data;
       if (!userStatus) {
         signOut({ callbackUrl: `${window.location.origin}/` });
       }
 
+      console.log(productData);
       setProduct(productData);
       setActive(productData.activeStatus);
-      setCategory(productData.category);
       setDesc(productData.desc);
       setName(productData.name);
       setPriceList(productData.price);
       setStockQty(productData.stockQty);
       setWarningQty(productData.warningQty);
+      setCategoryList(allCategory);
+
+      const theCategory = allCategory.find(
+        (category) => category._id === productData.category._id
+      );
+      setCategory(theCategory);
 
       const oldImgPaths = productData.image.map((link) => {
         return {
@@ -310,8 +316,8 @@ const EditProduct = ({ user }) => {
                 >
                   {categoryList.map((item) => {
                     return (
-                      <MenuItem value={item} key={item}>
-                        {item}
+                      <MenuItem value={item} key={item._id}>
+                        {item.name}
                       </MenuItem>
                     );
                   })}
@@ -466,7 +472,7 @@ const EditProduct = ({ user }) => {
                 label="Stock Quantity"
                 type="number"
                 value={stockQty}
-                onChange={(e) => setStockQty(e.target.value)}
+                onChange={(e) => setStockQty(Number(e.target.value))}
                 variant="standard"
                 required
                 sx={{
@@ -479,7 +485,7 @@ const EditProduct = ({ user }) => {
                 label="Stock Warning Quantity"
                 type="number"
                 value={warningQty}
-                onChange={(e) => setWarningQty(e.target.value)}
+                onChange={(e) => setWarningQty(Number(e.target.value))}
                 variant="standard"
                 required
                 sx={{
@@ -630,7 +636,7 @@ const EditProduct = ({ user }) => {
               type="submit"
               variant="contained"
             >
-              Add
+              Edit
             </Button>
           </form>
         </CardContent>

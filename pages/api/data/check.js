@@ -1,5 +1,6 @@
 import dbConnect from "../../../db/database";
 import Admin from "../../../models/admin";
+import Business from "../../../models/business";
 import { getSession } from "next-auth/react";
 
 dbConnect();
@@ -13,12 +14,14 @@ const getUser = async (req, res) => {
     const session = await getSession({ req });
     if (!session) return res.status(400).json({ msg: "Please login first." });
 
-    const { userId } = session.user;
+    const { userId, businessId } = session.user;
     const user = await Admin.findById(userId);
+    const business = await Business.findById(businessId);
 
     if (user) {
       return res.status(200).json({
         userStatus: true,
+        business,
       });
     } else {
       res.status(200).json({

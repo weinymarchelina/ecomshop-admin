@@ -3,14 +3,15 @@ const mongoose = require("mongoose");
 const ProductSchema = new mongoose.Schema(
   {
     name: String,
-    category: String,
+    category: Object,
     desc: String,
     image: Array,
-    stockQty: String,
-    warningQty: String,
+    stockQty: Number,
+    warningQty: Number,
     activeStatus: Boolean,
     price: Array,
     businessId: String,
+    soldQty: Number,
   },
   { timestamps: true }
 );

@@ -25,6 +25,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { useRouter } from "next/router";
+import ClassIcon from "@mui/icons-material/Class";
 
 const modalStyle = {
   position: "absolute",
@@ -40,7 +41,7 @@ const modalStyle = {
 };
 
 const styleDecide = (product) => {
-  if (!product.activeStatus || product.stockQty === "0") {
+  if (!product.activeStatus || product.stockQty === 0) {
     return {
       backgroundColor: "#ddd",
     };
@@ -54,7 +55,7 @@ const styleDecide = (product) => {
 const textDecide = (product) => {
   if (!product.activeStatus) {
     return "Inactive";
-  } else if (product.stockQty === "0") {
+  } else if (product.stockQty === 0) {
     return "Out of Stock";
   } else if (product.stockQty < product.warningQty) {
     return "Low Stock";
@@ -99,6 +100,7 @@ const Product = ({ user }) => {
       }
       setCategoryList(businessCategory);
       setProducts(productData);
+      console.log(productData.category);
     } catch (err) {
       console.log(err.message);
       console.log(err.response?.data);
@@ -169,7 +171,7 @@ const Product = ({ user }) => {
               (a, b) =>
                 (b.stockQty > b.warningQty) - (a.stockQty > a.warningQty)
             )
-            .sort((a, b) => (b.stockQty !== "0") - (a.stockQty !== "0"))
+            .sort((a, b) => (b.stockQty !== 0) - (a.stockQty !== 0))
             .sort((a, b) => b.activeStatus - a.activeStatus);
 
           break;
@@ -195,8 +197,6 @@ const Product = ({ user }) => {
     }
   };
   const handleEdit = (product) => {
-    //set cookies by saving the product._id
-
     router.push(`/products/edit/${product._id}`);
   };
 
@@ -222,6 +222,11 @@ const Product = ({ user }) => {
                 Product List
               </Typography>
               <Box>
+                <IconButton color="primary">
+                  <Link href={"/products/category"}>
+                    <ClassIcon sx={{ fontSize: 32 }} />
+                  </Link>
+                </IconButton>
                 <IconButton color="primary">
                   <Link href={"/products/add"}>
                     <AddBoxIcon sx={{ fontSize: 35 }} />
@@ -254,9 +259,9 @@ const Product = ({ user }) => {
                             </Typography>
                           </MenuItem>
                           {categoryList.map((category) => (
-                            <MenuItem key={category} value={category}>
+                            <MenuItem key={category._id} value={category.name}>
                               <Typography variant="subtitle1" component="p">
-                                {category}
+                                {category.name}
                               </Typography>
                             </MenuItem>
                           ))}
@@ -422,7 +427,7 @@ const Product = ({ user }) => {
                                       borderRadius: "0.35vw",
                                       backgroundColor: `${
                                         !product.activeStatus ||
-                                        product.stockQty === "0"
+                                        product.stockQty === 0
                                           ? "#eee"
                                           : "#FAE496"
                                       }`,
@@ -474,7 +479,7 @@ const Product = ({ user }) => {
                                   variant="caption"
                                   component="p"
                                 >
-                                  {product.category}
+                                  {product.category.name}
                                 </Typography>
                               </Box>
                             </Box>
