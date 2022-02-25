@@ -100,7 +100,6 @@ const Product = ({ user }) => {
       }
       setCategoryList(businessCategory);
       setProducts(productData);
-      console.log(productData.category);
     } catch (err) {
       console.log(err.message);
       console.log(err.response?.data);
@@ -113,7 +112,7 @@ const Product = ({ user }) => {
     if (selectedCategory === "All") return products;
     else if (selectedCategory !== "All")
       return products.filter(
-        (product) => product.category === selectedCategory
+        (product) => product.category._id === selectedCategory._id
       );
   };
 
@@ -259,7 +258,7 @@ const Product = ({ user }) => {
                             </Typography>
                           </MenuItem>
                           {categoryList.map((category) => (
-                            <MenuItem key={category._id} value={category.name}>
+                            <MenuItem key={category._id} value={category}>
                               <Typography variant="subtitle1" component="p">
                                 {category.name}
                               </Typography>

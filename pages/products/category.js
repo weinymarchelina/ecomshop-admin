@@ -27,9 +27,11 @@ import { useRouter } from "next/router";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import ErrorWarning from "../../components/ErrorWarning";
+import EditIcon from "@mui/icons-material/Edit";
 
 const BusinessCategory = ({ user }) => {
   const matches = useMediaQuery("(max-width:720px)");
+  const [products, setProducts] = useState([]);
   const [newCategory, setNewCategory] = useState("");
   const [categoryList, setCategoryList] = useState([]);
   const [error, setError] = useState(null);
@@ -37,14 +39,16 @@ const BusinessCategory = ({ user }) => {
 
   useEffect(async () => {
     try {
-      const res = await axios.get("/api/data/business");
-      const { business, userStatus } = res.data;
+      const res = await axios.get("/api/products");
+      const { businessCategory, userStatus, productData } = res.data;
       if (!userStatus) {
         signOut({ callbackUrl: `${window.location.origin}/` });
       }
 
-      setCategoryList(business.category);
-      console.log(business.category);
+      setCategoryList(businessCategory);
+      console.log(businessCategory);
+      setProducts(productData);
+      console.log(productData);
     } catch (err) {
       console.log(err.message);
       throw new Error(err.message);
@@ -72,6 +76,15 @@ const BusinessCategory = ({ user }) => {
   };
 
   const deleteCategory = (selectedCategory) => {
+    const categoryUsed = products.filter((product) => {
+      return selectedCategory._id === product.category._id;
+    });
+    if (categoryUsed[0]) {
+      return setError(
+        "Cannot delete category because category is still being used in the product"
+      );
+    }
+
     const newCategoryList = categoryList.filter(
       (eachCategory) => selectedCategory._id !== eachCategory._id
     );

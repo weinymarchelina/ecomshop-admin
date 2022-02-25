@@ -1,6 +1,13 @@
 import dbConnect from "../../../db/database";
 import Product from "../../../models/product";
 import { getSession } from "next-auth/react";
+const cloudinary = require("cloudinary").v2;
+
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_API_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 dbConnect();
 
@@ -23,7 +30,30 @@ const editProduct = async (req, res) => {
       activeStatus,
       price,
       id,
+      deletedLinks,
     } = req.body;
+
+    // for (const link of deletedLinks) {
+    //   cloudinary.uploader
+    //     .destroy(link, function (error, result) {
+    //       console.log(result, error);
+    //     })
+    //     .then((resp) => console.log(resp))
+    //     .catch((_err) =>
+    //       console.log("Something went wrong, please try again later.")
+    //     );
+    // }
+
+    // deletedLinks.forEach((links) => {
+    //   cloudinary.uploader
+    //     .destroy(links, function (error, result) {
+    //       console.log(result, error);
+    //     })
+    //     .then((resp) => console.log(resp))
+    //     .catch((_err) =>
+    //       console.log("Something went wrong, please try again later.")
+    //     );
+    // });
 
     const response = await Product.updateOne(
       { _id: id },

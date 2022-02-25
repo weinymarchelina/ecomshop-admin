@@ -98,7 +98,7 @@ const AddProduct = ({ user }) => {
       formData.append("upload_preset", "superoneaccdebest");
 
       const res = await axios.post(
-        "https://api.cloudinary.com/v1_1/superoneacc/image/upload",
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_API_CLOUD_NAME}/image/upload`,
         formData
       );
 

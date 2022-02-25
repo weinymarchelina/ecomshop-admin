@@ -49,6 +49,7 @@ const EditProduct = ({ user }) => {
   const [priceList, setPriceList] = useState([]);
   const [active, setActive] = useState(true);
   const [imgPath, setImgPath] = useState([]);
+  const [oldImgPath, setOldImgPath] = useState([]);
   const [uploadData, setUploadData] = useState("");
   const [categoryList, setCategoryList] = useState([]);
   const [imgError, setImgError] = useState(null);
@@ -89,8 +90,10 @@ const EditProduct = ({ user }) => {
         };
       });
       setImgPath(oldImgPaths);
+      setOldImgPath(productData.image);
     } catch (err) {
-      console.log(err.response?.data.msg);
+      console.log(err.response.data.msg);
+      console.log(err.response?.data);
       throw new Error(err.message);
     }
   }, []);
@@ -133,7 +136,7 @@ const EditProduct = ({ user }) => {
       formData.append("upload_preset", "superoneaccdebest");
 
       const res = await axios.post(
-        "https://api.cloudinary.com/v1_1/superoneacc/image/upload",
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_API_CLOUD_NAME}/image/upload`,
         formData
       );
 
@@ -143,21 +146,31 @@ const EditProduct = ({ user }) => {
     });
 
     axios.all(imgLinks).then(async (image) => {
-      console.log(image);
+      // console.log(image);
+
+      const deletedLinks = oldImgPath.filter((link) => {
+        if (!image.includes(link)) {
+          return link;
+        }
+      });
+      console.log("Yo");
+      console.log(deletedLinks);
+
       const product = {
         name,
         category,
         desc,
         image,
-        stockQty,
-        warningQty,
+        stockQty: Number(stockQty),
+        warningQty: Number(warningQty),
         activeStatus: active,
         price: priceList,
         businessId: user.businessId,
         id,
+        deletedLinks,
       };
 
-      console.log(product);
+      // console.log(product);
 
       try {
         const res = await axios.post("/api/products/edit", product);
@@ -472,7 +485,7 @@ const EditProduct = ({ user }) => {
                 label="Stock Quantity"
                 type="number"
                 value={stockQty}
-                onChange={(e) => setStockQty(Number(e.target.value))}
+                onChange={(e) => setStockQty(e.target.value.toString())}
                 variant="standard"
                 required
                 sx={{
@@ -485,7 +498,7 @@ const EditProduct = ({ user }) => {
                 label="Stock Warning Quantity"
                 type="number"
                 value={warningQty}
-                onChange={(e) => setWarningQty(Number(e.target.value))}
+                onChange={(e) => setWarningQty(e.target.value.toString())}
                 variant="standard"
                 required
                 sx={{
