@@ -85,7 +85,7 @@ const BusinessCategory = ({ user }) => {
     }
 
     const newCategoryList = categoryList.filter(
-      (eachCategory) => selectedCategory._id !== eachCategory._id
+      (eachCategory) => selectedCategory.name !== eachCategory.name
     );
 
     setCategoryList(newCategoryList);
@@ -173,7 +173,7 @@ const BusinessCategory = ({ user }) => {
             <List>
               {categoryList.map((category) => (
                 <ListItem
-                  key={category._id}
+                  key={category.name}
                   sx={{ py: 0, px: 2 }}
                   style={{
                     border: "1px solid #ddd",

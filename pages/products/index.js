@@ -112,7 +112,7 @@ const Product = ({ user }) => {
     if (selectedCategory === "All") return products;
     else if (selectedCategory !== "All")
       return products.filter(
-        (product) => product.category._id === selectedCategory._id
+        (product) => product.category.name === selectedCategory.name
       );
   };
 
@@ -258,7 +258,7 @@ const Product = ({ user }) => {
                             </Typography>
                           </MenuItem>
                           {categoryList.map((category) => (
-                            <MenuItem key={category._id} value={category}>
+                            <MenuItem key={category.name} value={category}>
                               <Typography variant="subtitle1" component="p">
                                 {category.name}
                               </Typography>

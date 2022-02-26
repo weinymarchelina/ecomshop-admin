@@ -78,7 +78,7 @@ const EditProduct = ({ user }) => {
       setCategoryList(allCategory);
 
       const theCategory = allCategory.find(
-        (category) => category._id === productData.category._id
+        (category) => category.name === productData.category.name
       );
       setCategory(theCategory);
 
