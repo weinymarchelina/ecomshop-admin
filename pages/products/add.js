@@ -73,7 +73,7 @@ const AddProduct = ({ user }) => {
       console.log(err.response?.data.msg);
       throw new Error(err.message);
     }
-  }, [imgPath]);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -114,8 +114,8 @@ const AddProduct = ({ user }) => {
         category,
         desc,
         image,
-        stockQty,
-        warningQty,
+        stockQty: Number(stockQty),
+        warningQty: Number(warningQty),
         activeStatus: active,
         price: priceList,
         businessId: user.businessId,
@@ -435,7 +435,7 @@ const AddProduct = ({ user }) => {
                 label="Stock Quantity"
                 type="number"
                 value={stockQty}
-                onChange={(e) => setStockQty(Number(e.target.value))}
+                onChange={(e) => setStockQty(e.target.value)}
                 variant="standard"
                 required
                 sx={{
@@ -448,7 +448,7 @@ const AddProduct = ({ user }) => {
                 label="Stock Warning Quantity"
                 type="number"
                 value={warningQty}
-                onChange={(e) => setWarningQty(Number(e.target.value))}
+                onChange={(e) => setWarningQty(e.target.value)}
                 variant="standard"
                 required
                 sx={{

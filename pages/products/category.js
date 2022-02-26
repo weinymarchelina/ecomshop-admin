@@ -27,7 +27,6 @@ import { useRouter } from "next/router";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import ErrorWarning from "../../components/ErrorWarning";
-import EditIcon from "@mui/icons-material/Edit";
 
 const BusinessCategory = ({ user }) => {
   const matches = useMediaQuery("(max-width:720px)");
@@ -77,11 +76,11 @@ const BusinessCategory = ({ user }) => {
 
   const deleteCategory = (selectedCategory) => {
     const categoryUsed = products.filter((product) => {
-      return selectedCategory._id === product.category._id;
+      return selectedCategory.name === product.category.name;
     });
     if (categoryUsed[0]) {
       return setError(
-        "Cannot delete category because category is still being used in the product"
+        "Cannot delete category because the selected category is still being used in the product"
       );
     }
 
@@ -95,7 +94,13 @@ const BusinessCategory = ({ user }) => {
 
   const handleSave = async () => {
     try {
-      const nameArr = categoryList.map((category) => category.name);
+      const nameArr = categoryList
+        .map((category) => category.name)
+        .sort((a, b) => {
+          const textA = a.toUpperCase();
+          const textB = b.toUpperCase();
+          return textA < textB ? -1 : textA > textB ? 1 : 0;
+        });
       const res = await axios.post("/api/products/category", nameArr);
 
       console.log(res);
