@@ -146,15 +146,11 @@ const EditProduct = ({ user }) => {
     });
 
     axios.all(imgLinks).then(async (image) => {
-      // console.log(image);
-
       const deletedLinks = oldImgPath.filter((link) => {
         if (!image.includes(link)) {
           return link;
         }
       });
-      console.log("Yo");
-      console.log(deletedLinks);
 
       const product = {
         name,
@@ -170,7 +166,7 @@ const EditProduct = ({ user }) => {
         deletedLinks,
       };
 
-      // console.log(product);
+      console.log(product);
 
       try {
         const res = await axios.post("/api/products/edit", product);

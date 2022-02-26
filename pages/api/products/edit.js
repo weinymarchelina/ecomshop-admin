@@ -33,27 +33,28 @@ const editProduct = async (req, res) => {
       deletedLinks,
     } = req.body;
 
-    // for (const link of deletedLinks) {
-    //   cloudinary.uploader
-    //     .destroy(link, function (error, result) {
-    //       console.log(result, error);
-    //     })
-    //     .then((resp) => console.log(resp))
-    //     .catch((_err) =>
-    //       console.log("Something went wrong, please try again later.")
-    //     );
-    // }
+    // console.log("howdyy");
+    // console.log(deletedLinks[0]);
+    // console.log(deletedLinks[0].length);
+    // console.log(deletedLinks[0].substring(64, 104));
+    // const testResponse = await cloudinary.uploader.destroy(
+    //   deletedLinks[0].substring(64, 104),
+    //   (result) => {
+    //     return result;
+    //   }
+    // );
+    // console.log(testResponse);
 
-    // deletedLinks.forEach((links) => {
-    //   cloudinary.uploader
-    //     .destroy(links, function (error, result) {
-    //       console.log(result, error);
-    //     })
-    //     .then((resp) => console.log(resp))
-    //     .catch((_err) =>
-    //       console.log("Something went wrong, please try again later.")
-    //     );
-    // });
+    for (const link of deletedLinks) {
+      cloudinary.uploader
+        .destroy(link.substring(64, 104), (error, result) => {
+          console.log(result, error);
+        })
+        .then((resp) => console.log(resp))
+        .catch((_err) =>
+          console.log("Something went wrong, please try again later.")
+        );
+    }
 
     const response = await Product.updateOne(
       { _id: id },
