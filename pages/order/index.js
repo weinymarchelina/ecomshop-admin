@@ -79,7 +79,7 @@ const OrderList = ({ user }) => {
   };
 
   const handleEdit = (order) => {
-    //
+    router.push(`/order/edit/${order._id}`);
   };
   const handleCancel = (order) => {
     //
@@ -128,6 +128,7 @@ const OrderList = ({ user }) => {
                         "&:hover": {
                           opacity: 0.85,
                         },
+                        mb: 3,
                       }}
                       onClick={() => router.push(`/order/${order._id}`)}
                     >

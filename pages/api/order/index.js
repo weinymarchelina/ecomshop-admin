@@ -21,6 +21,8 @@ const getOrder = async (req, res) => {
       businessId: businessId,
     });
 
+    // console.log(orderData);
+
     res.status(200).json({
       orderData,
       productData,

@@ -51,6 +51,8 @@ const DisplayOrder = ({ user }) => {
         const productObj = orderedProducts[0];
         productObj.orderedQty = item.quantity;
         productObj.orderedPrice = item.price;
+
+        console.log(orderData);
         console.log(productObj);
         return productObj;
       });
@@ -248,6 +250,26 @@ const DisplayOrder = ({ user }) => {
                   }}
                 >
                   <Typography variant={stacks ? "caption" : "body1"}>
+                    Customer Name
+                  </Typography>
+                  <Typography
+                    variant={stacks ? "caption" : "body1"}
+                    textAlign="right"
+                  >
+                    {order.customerName}
+                  </Typography>
+                </Card>
+                <Card
+                  variant="outlined"
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    px: 2,
+                    py: 1,
+                  }}
+                >
+                  <Typography variant={stacks ? "caption" : "body1"}>
                     Order Date
                   </Typography>
                   <Typography
@@ -347,51 +369,51 @@ const DisplayOrder = ({ user }) => {
                     {formatter.format(order.totalPrice)}
                   </Typography>
                 </Card>
+                <Box
+                  sx={{
+                    display: "flex",
+                    mt: 3,
+                    gap: 1,
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  {!order.doneStatus && (
+                    <>
+                      <Button
+                        size="small"
+                        onClick={() => handleCancel(order)}
+                        variant="outlined"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleEdit(order)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        onClick={() => handleFinish(order)}
+                      >
+                        Finish
+                      </Button>
+                    </>
+                  )}
+                  {order.doneStatus && user.role === "Owner" && (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => handleEdit(order)}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </Box>
               </>
             )}
-            <Box
-              sx={{
-                display: "flex",
-                mt: 3,
-                gap: 1,
-                justifyContent: "flex-end",
-              }}
-            >
-              {!order.doneStatus && (
-                <>
-                  <Button
-                    size="small"
-                    onClick={() => handleCancel(order)}
-                    variant="outlined"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={() => handleEdit(order)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="contained"
-                    onClick={() => handleFinish(order)}
-                  >
-                    Finish
-                  </Button>
-                </>
-              )}
-              {order.doneStatus && user.role === "Owner" && (
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={() => handleEdit(order)}
-                >
-                  Edit
-                </Button>
-              )}
-            </Box>
           </Box>
         </Box>
       )}
