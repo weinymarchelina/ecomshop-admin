@@ -2,12 +2,16 @@ const mongoose = require("mongoose");
 
 const OrderSchema = new mongoose.Schema(
   {
-    orderDate: String,
     finishDate: String,
     itemList: Array,
     totalPrice: Number,
+    totalQty: Number,
     paymentMethod: String,
-    customer: String,
+    customerName: String,
+    customerId: String,
+    doneStatus: Boolean,
+    note: String,
+    businessId: String,
   },
   { timestamps: true }
 );

@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 
-const links = ["Dashboard", "Products", "Orders", "Report", "Settings"];
+const links = ["Dashboard", "Products", "Order", "Report", "Settings"];
 
 const Navbar = () => {
   const { data: session } = useSession();

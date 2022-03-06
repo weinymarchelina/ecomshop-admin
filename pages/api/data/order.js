@@ -13,12 +13,15 @@ const getOrder = async (req, res) => {
   try {
     const session = await getSession({ req });
     if (!session) return res.status(400).json({ msg: "Please login first." });
-    const { orderId } = req.body;
     const { businessId } = session.user;
 
-    const orderData = await Order.findById(orderId);
+    // const orderData = await Order.find({
+    //   businessId,
+    // }).sort({ _id: -1 });
+    const orderData = await Order.find().sort({ _id: -1 });
+
     const productData = await Product.find({
-      businessId: businessId,
+      businessId,
     });
 
     res.status(200).json({
