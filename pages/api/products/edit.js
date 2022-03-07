@@ -33,18 +33,6 @@ const editProduct = async (req, res) => {
       deletedLinks,
     } = req.body;
 
-    // console.log("howdyy");
-    // console.log(deletedLinks[0]);
-    // console.log(deletedLinks[0].length);
-    // console.log(deletedLinks[0].substring(64, 104));
-    // const testResponse = await cloudinary.uploader.destroy(
-    //   deletedLinks[0].substring(64, 104),
-    //   (result) => {
-    //     return result;
-    //   }
-    // );
-    // console.log(testResponse);
-
     for (const link of deletedLinks) {
       cloudinary.uploader
         .destroy(link.substring(64, 104), (error, result) => {

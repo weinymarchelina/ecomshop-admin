@@ -27,16 +27,6 @@ const addOrder = async (req, res) => {
       }
     );
 
-    // for (const product of products) {
-    //   const result = await Product.updateOne(
-    //     { _id: product.productId },
-    //     {
-    //       stockQty: product.stockQty,
-    //     }
-    //   );
-    //   console.log(result)
-    // }
-
     const updateProducts = products.map(async (product) => {
       console.log(product.name + ": " + product.stockQty);
       const result = await Product.updateOne(
@@ -47,59 +37,6 @@ const addOrder = async (req, res) => {
       );
       console.log(result);
     });
-
-    // for (const product of products) {
-    //   const theOrderedQty = orderOriItem.find(
-    //     (item) => item.productId === product._id
-    //   );
-
-    //   const currentStock =
-    //     product.stockQty + theOrderedQty.quantity - product.orderedQty;
-
-    //   console.log(`
-    //   Product name: ${product.name}
-    //   Original Stock: ${product.stockQty + theOrderedQty.quantity}
-    //   Purchased: ${product.orderedQty}
-    //   Current Stock: ${currentStock}
-    //   `);
-
-    //   const result = await Product.updateOne(
-    //     { _id: product.productId },
-    //     {
-    //       stockQty: currentStock,
-    //     }
-    //   );
-
-    //   const productData = await Product.findById(product.productId);
-    //   console.log(productData);
-    // }
-
-    // const newProducts = products.map(async (product) => {
-    //   const theOrderedQty = orderOriItem.find(
-    //     (item) => item.productId === product._id
-    //   );
-
-    //   const currentStock =
-    //     product.stockQty + theOrderedQty.quantity - product.orderedQty;
-
-    //   console.log(`
-    //     Product name: ${product.name}
-    //     Original Stock: ${product.stockQty + theOrderedQty.quantity}
-    //     Purchased: ${product.orderedQty}
-    //     Current Stock: ${currentStock}
-    //     `);
-
-    //   const result = await Product.updateOne(
-    //     { _id: product.productId },
-    //     {
-    //       stockQty: currentStock,
-    //     }
-    //   );
-
-    //   const productData = await Product.findById(product.productId);
-    //   console.log(productData);
-    //   return await productData;
-    // });
 
     const newOrder = await axios
       .all(updateProducts)

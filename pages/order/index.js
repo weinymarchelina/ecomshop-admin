@@ -6,6 +6,11 @@ import {
   Typography,
   Button,
   Modal,
+  FormControl,
+  TextField,
+  Select,
+  InputLabel,
+  MenuItem,
 } from "@mui/material";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -43,6 +48,16 @@ const OrderList = ({ user }) => {
   const [orders, setOrders] = useState([]);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState("All");
+  const filterList = [
+    "Unfinished",
+    "Finished",
+    "Canceled",
+    "Today",
+    "This Week",
+    "This Month",
+  ];
   const router = useRouter();
 
   useEffect(async () => {
@@ -75,36 +90,156 @@ const OrderList = ({ user }) => {
     }
   }, []);
 
+  const searchOrder = () => {
+    if (filter === "All") return orders;
+    else if (searchTerm) {
+      return orders.filter((order) =>
+        order.customerName.toLowerCase().includes(searchTerm)
+      );
+    } else return orders;
+  };
+
+  const searchedOrder = searchOrder();
+
+  const filterOrders = () => {
+    let filteredOrders;
+    if (searchedOrder) {
+      switch (filter) {
+        case "Unfinished":
+          filteredOrders = searchedOrder.filter((order) => !order.doneStatus);
+
+          break;
+
+        case "Finished":
+          filteredOrders = searchedOrder.filter(
+            (order) => order.doneStatus && order.finishDate !== "-"
+          );
+
+          break;
+
+        case "Canceled":
+          filteredOrders = searchedOrder.filter(
+            (order) => order.doneStatus && order.finishDate === "-"
+          );
+          console.log(filteredOrders);
+          break;
+
+        case "Today":
+          filteredOrders = searchedOrder.filter(
+            (order) =>
+              moment(order.createdAt).format("LL") ===
+              moment(new Date()).format("LL")
+          );
+
+          break;
+
+        case "This Week":
+          filteredOrders = searchedOrder.filter((order) => {
+            const startDayOfPrevWeek = moment(new Date())
+              .startOf("week")
+              .format("lll");
+            const lastDayOfPrevWeek = moment(new Date())
+              .endOf("week")
+              .format("lll");
+
+            const orderDate = moment(order.createdAt).format("lll");
+
+            return moment(orderDate).isBetween(
+              startDayOfPrevWeek,
+              lastDayOfPrevWeek
+            );
+          });
+
+          break;
+
+        case "This Month":
+          filteredOrders = searchedOrder.filter((order) => {
+            const startDayOfMonth = moment(new Date())
+              .startOf("month")
+              .format("lll");
+            const lastDayOfMonth = moment(new Date())
+              .endOf("month")
+              .format("lll");
+
+            const orderDate = moment(order.createdAt).format("lll");
+
+            return moment(orderDate).isBetween(startDayOfMonth, lastDayOfMonth);
+          });
+
+          break;
+
+        default:
+          filteredOrders = orders;
+
+          break;
+      }
+    } else {
+      filteredOrders = orders;
+    }
+
+    return filteredOrders;
+  };
+  const newOrders = filterOrders();
+
   const getStatus = (order) => {
-    if (order.doneStatus) {
-      return "Finished";
-    } else if (order.finishDate === "-") {
+    if (order.finishDate === "-") {
       return "Canceled";
+    } else if (order.doneStatus) {
+      return "Finished";
     } else {
       return "On Process";
     }
   };
 
-  const getColor = (order) => {
-    if (order.doneStatus) {
-      return "green";
-    } else if (order.finishDate === "-") {
-      return "#ccc";
+  const getStyle = (order) => {
+    if (order.finishDate === "-") {
+      return {
+        backgroundColor: "#ccc",
+      };
+    } else if (order.doneStatus) {
+      return {
+        backgroundColor: "#58B24D",
+        color: "#fff",
+      };
     } else {
-      return "#eee";
+      return {
+        backgroundColor: "#eee",
+      };
     }
   };
 
   const handleEdit = (order) => {
     router.push(`/order/edit/${order._id}`);
   };
-  const handleCancel = (order) => {
-    //
+
+  const handleCancel = async (order) => {
     console.log("Cancel!");
+    try {
+      const res = await axios.post("/api/order/done", {
+        orderId: order._id,
+        done: false,
+      });
+      const { msg } = res.data;
+      console.log(msg);
+    } catch (err) {
+      console.log(err.message);
+      throw new Error(err.message);
+    }
   };
-  const handleFinish = (order) => {
-    //
+
+  const handleFinish = async (order) => {
     console.log("Finish");
+    try {
+      const res = await axios.post("/api/order/done", {
+        orderId: order._id,
+        done: true,
+      });
+      const { msg } = res.data;
+      console.log(msg);
+    } catch (err) {
+      console.log(err.message);
+      throw new Error(err.message);
+    }
   };
 
   return (
@@ -135,6 +270,50 @@ const OrderList = ({ user }) => {
                 Transaction List
               </Typography>
             </Box>
+
+            {newOrders && (
+              <Card variant="outlined" sx={{ mt: 3 }}>
+                <CardContent
+                  className={`${matches ? "f-col" : "f-space"}`}
+                  sx={{ alignItems: "center", py: 3, gap: 3 }}
+                >
+                  <Box
+                    className="f-space"
+                    sx={{ flex: 2, gap: 3, width: "100%" }}
+                  >
+                    <FormControl variant="standard" sx={{ flex: 1 }}>
+                      <InputLabel>Filter</InputLabel>
+                      <Select
+                        value={filter}
+                        label="Category"
+                        onChange={(e) => setFilter(e.target.value)}
+                      >
+                        <MenuItem value="All">
+                          <Typography variant="subtitle1" component="p">
+                            All
+                          </Typography>
+                        </MenuItem>
+                        {filterList.map((filter) => (
+                          <MenuItem key={filter} value={filter}>
+                            <Typography variant="subtitle1" component="p">
+                              {filter}
+                            </Typography>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+                  <TextField
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    label="Search"
+                    variant="standard"
+                    sx={{ flex: 2, pt: 0.65 }}
+                    autoComplete="off"
+                    fullWidth
+                  />
+                </CardContent>
+              </Card>
+            )}
 
             {open && (
               <Modal open={open} onClose={() => setOpen(false)}>
@@ -172,215 +351,222 @@ const OrderList = ({ user }) => {
               </Modal>
             )}
 
-            <Box sx={{ mt: 2 }}>
-              {orders.map((order) => {
-                return (
-                  <Box key={order._id}>
-                    <Card
-                      variant="outlined"
-                      sx={{
-                        cursor: "pointer",
-                        "&:hover": {
-                          opacity: 0.85,
-                        },
-                        mb: 3,
-                      }}
-                      onClick={() => router.push(`/order/${order._id}`)}
-                    >
-                      <CardContent
-                        className="f-col"
-                        sx={{ justifyContent: "center" }}
+            {newOrders && (
+              <Box sx={{ mt: 2 }}>
+                {newOrders.map((order) => {
+                  return (
+                    <Box key={order._id}>
+                      <Card
+                        variant="outlined"
+                        sx={{
+                          cursor: "pointer",
+                          "&:hover": {
+                            opacity: 0.85,
+                          },
+                          mb: 3,
+                        }}
+                        onClick={() => router.push(`/order/${order._id}`)}
                       >
-                        <Box
-                          sx={{ pb: 1 }}
-                          style={{ borderBottom: "1px solid #ccc" }}
+                        <CardContent
+                          className="f-col"
+                          sx={{ justifyContent: "center" }}
                         >
-                          <Typography variant="caption" component="p">
-                            Order from {order.customerName}
-                          </Typography>
-                        </Box>
-                        <Box className={stacks ? "f-col" : "f-space"}>
                           <Box
-                            sx={{
-                              display: "flex",
-                              alignItems: `${stacks ? "center" : "flex-start"}`,
-                              my: 2,
-                            }}
+                            sx={{ pb: 1 }}
+                            style={{ borderBottom: "1px solid #ccc" }}
                           >
-                            <Box>
-                              <img
-                                src={order.firstItem.image[0]}
-                                alt={`${order.firstItem.name}-img`}
-                                style={{
+                            <Typography variant="caption" component="p">
+                              Order from {order.customerName}
+                            </Typography>
+                          </Box>
+                          <Box className={stacks ? "f-col" : "f-space"}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: `${
+                                  stacks ? "center" : "flex-start"
+                                }`,
+                                my: 2,
+                              }}
+                            >
+                              <Box>
+                                <img
+                                  src={order.firstItem.image[0]}
+                                  alt={`${order.firstItem.name}-img`}
+                                  style={{
+                                    width: `${
+                                      stacks ? "3.75rem" : "calc(5rem + 1vw)"
+                                    }`,
+                                    height: `${
+                                      stacks ? "3.75rem" : "calc(5rem + 1vw)"
+                                    }`,
+                                    margin: "0 .5rem",
+                                  }}
+                                />
+                              </Box>
+                              <Box
+                                sx={{
+                                  px: 1,
+                                  mt: 1,
                                   width: `${
-                                    stacks ? "3.75rem" : "calc(5rem + 1vw)"
+                                    matches ? "calc(37.5vw + 5rem)" : "100%"
                                   }`,
-                                  height: `${
-                                    stacks ? "3.75rem" : "calc(5rem + 1vw)"
-                                  }`,
-                                  margin: "0 .5rem",
                                 }}
-                              />
+                              >
+                                <Typography
+                                  sx={{ mr: 3, fontSize: "0.6rem" }}
+                                  component="p"
+                                >
+                                  {moment(order.createdAt).format("LLL")}
+                                </Typography>
+                                <Typography
+                                  variant="body1"
+                                  component="h2"
+                                  noWrap
+                                  sx={{ width: "100%" }}
+                                >
+                                  {order.firstItem.name}
+                                </Typography>
+                                <Box
+                                  sx={{
+                                    display: "flex-col",
+                                    alignItems: "flex-end",
+                                  }}
+                                >
+                                  <Typography variant="caption" component="p">
+                                    {order.itemList[0].quantity} pcs x{" "}
+                                    {formatter.format(order.itemList[0].price)}
+                                  </Typography>
+
+                                  {order.productQty > 1 && (
+                                    <Typography
+                                      variant="caption"
+                                      component="p"
+                                      sx={{ mt: 1 }}
+                                    >
+                                      + {order.productQty - 1} other product
+                                    </Typography>
+                                  )}
+                                </Box>
+                              </Box>
                             </Box>
                             <Box
                               sx={{
-                                px: 1,
-                                mt: 1,
-                                width: `${
-                                  matches ? "calc(37.5vw + 5rem)" : "100%"
+                                display: "flex",
+                                flexDirection: `${
+                                  stacks ? "row-reverse" : "column"
                                 }`,
+                                justifyContent: "space-between",
                               }}
                             >
-                              <Typography
-                                sx={{ mr: 3, fontSize: "0.6rem" }}
-                                component="p"
-                              >
-                                {moment(order.createdAt).format("LLL")}
-                              </Typography>
-                              <Typography
-                                variant="body1"
-                                component="h2"
-                                noWrap
-                                sx={{ width: "100%" }}
-                              >
-                                {order.firstItem.name}
-                              </Typography>
-                              <Box
-                                sx={{
-                                  display: "flex-col",
-                                  alignItems: "flex-end",
-                                }}
-                              >
-                                <Typography variant="caption" component="p">
-                                  {order.itemList[0].quantity} pcs x{" "}
-                                  {formatter.format(order.itemList[0].price)}
+                              <Box sx={{ mt: 2 }}>
+                                <Typography
+                                  variant="caption"
+                                  component="p"
+                                  className="main-title"
+                                  textAlign="center"
+                                  sx={{
+                                    fontSize: `${
+                                      stacks ? "0.75rem" : "0.7rem"
+                                    }`,
+                                    px: 1,
+                                    py: 0.5,
+                                    borderRadius: "0.35vw",
+                                    // backgroundColor: getColor(order),
+                                  }}
+                                  style={getStyle(order)}
+                                >
+                                  {getStatus(order)}
                                 </Typography>
-
-                                {order.productQty > 1 && (
-                                  <Typography
-                                    variant="caption"
-                                    component="p"
-                                    sx={{ mt: 1 }}
-                                  >
-                                    + {order.productQty - 1} other product
-                                  </Typography>
-                                )}
+                              </Box>
+                              <Box sx={{ mr: 2 }}>
+                                <Typography
+                                  sx={{
+                                    textTransform: "uppercase",
+                                  }}
+                                  variant="caption"
+                                  component="p"
+                                >
+                                  Total
+                                </Typography>
+                                <Typography variant="p" fontWeight={500}>
+                                  {formatter.format(order.totalPrice)}
+                                </Typography>
                               </Box>
                             </Box>
                           </Box>
+
                           <Box
                             sx={{
+                              mt: 3,
                               display: "flex",
-                              flexDirection: `${
-                                stacks ? "row-reverse" : "column"
-                              }`,
-                              justifyContent: "space-between",
+                              justifyContent: "flex-end",
                             }}
                           >
-                            <Box sx={{ mt: 2 }}>
-                              <Typography
-                                variant="caption"
-                                component="p"
-                                className="main-title"
-                                textAlign="center"
-                                sx={{
-                                  fontSize: `${stacks ? "0.75rem" : "0.7rem"}`,
-                                  px: 1,
-                                  py: 0.5,
-                                  borderRadius: "0.35vw",
-                                  backgroundColor: getColor(order),
-                                }}
-                              >
-                                {getStatus(order)}
-                              </Typography>
-                            </Box>
-                            <Box sx={{ mr: 2 }}>
-                              <Typography
-                                sx={{
-                                  textTransform: "uppercase",
-                                }}
-                                variant="caption"
-                                component="p"
-                              >
-                                Total
-                              </Typography>
-                              <Typography variant="p" fontWeight={500}>
-                                {formatter.format(order.totalPrice)}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </Box>
-
-                        <Box
-                          sx={{
-                            mt: 3,
-                            display: "flex",
-                            justifyContent: "flex-end",
-                          }}
-                        >
-                          <Box sx={{ display: "flex", gap: 1 }}>
-                            {!order.doneStatus && (
-                              <>
-                                <Button
-                                  size="small"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setOpen(true);
-                                    setAction({
-                                      name: "cancel",
-                                      func: handleCancel,
-                                      order,
-                                    });
-                                    // handleCancel(order);
-                                  }}
-                                  variant="outlined"
-                                >
-                                  Cancel
-                                </Button>
+                            <Box sx={{ display: "flex", gap: 1 }}>
+                              {!order.doneStatus && (
+                                <>
+                                  <Button
+                                    size="small"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setOpen(true);
+                                      setAction({
+                                        name: "cancel",
+                                        func: handleCancel,
+                                        order,
+                                      });
+                                      // handleCancel(order);
+                                    }}
+                                    variant="outlined"
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    variant="outlined"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleEdit(order);
+                                    }}
+                                  >
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    size="small"
+                                    variant="contained"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setOpen(true);
+                                      setAction({
+                                        name: "finish",
+                                        func: handleFinish,
+                                        order,
+                                      });
+                                    }}
+                                  >
+                                    Finish
+                                  </Button>
+                                </>
+                              )}
+                              {order.doneStatus && user.role === "Owner" && (
                                 <Button
                                   size="small"
                                   variant="outlined"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleEdit(order);
-                                  }}
+                                  onClick={() => handleEdit(order)}
                                 >
                                   Edit
                                 </Button>
-                                <Button
-                                  size="small"
-                                  variant="contained"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setOpen(true);
-                                    setAction({
-                                      name: "finish",
-                                      func: handleFinish,
-                                      order,
-                                    });
-                                  }}
-                                >
-                                  Finish
-                                </Button>
-                              </>
-                            )}
-                            {order.doneStatus && user.role === "Owner" && (
-                              <Button
-                                size="small"
-                                variant="outlined"
-                                onClick={() => handleEdit(order)}
-                              >
-                                Edit
-                              </Button>
-                            )}
+                              )}
+                            </Box>
                           </Box>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Box>
-                );
-              })}
-            </Box>
+                        </CardContent>
+                      </Card>
+                    </Box>
+                  );
+                })}
+              </Box>
+            )}
           </Box>
         </Box>
       )}

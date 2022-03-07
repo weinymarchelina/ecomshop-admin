@@ -68,22 +68,29 @@ const DisplayOrder = ({ user }) => {
   }, [id]);
 
   const getStatus = (order) => {
-    if (order.doneStatus) {
-      return "Finished";
-    } else if (order.finishDate === "-") {
+    if (order.finishDate === "-") {
       return "Canceled";
+    } else if (order.doneStatus) {
+      return "Finished";
     } else {
       return "On Process";
     }
   };
 
-  const getColor = (order) => {
-    if (order.doneStatus) {
-      return "green";
-    } else if (order.finishDate === "-") {
-      return "#ccc";
+  const getStyle = (order) => {
+    if (order.finishDate === "-") {
+      return {
+        backgroundColor: "#ccc",
+      };
+    } else if (order.doneStatus) {
+      return {
+        backgroundColor: "#58B24D",
+        color: "#fff",
+      };
     } else {
-      return "#eee";
+      return {
+        backgroundColor: "#eee",
+      };
     }
   };
 
@@ -155,8 +162,9 @@ const DisplayOrder = ({ user }) => {
                     px: 1,
                     py: 0.5,
                     borderRadius: "0.35vw",
-                    backgroundColor: getColor(order),
+                    // backgroundColor: getColor(order),
                   }}
+                  style={getStyle(order)}
                 >
                   {getStatus(order)}
                 </Typography>
@@ -290,7 +298,7 @@ const DisplayOrder = ({ user }) => {
                   </Typography>
                 </Card>
 
-                {order.doneStatus && order.doneStatus !== "-" && (
+                {order.doneStatus && (
                   <Card
                     variant="outlined"
                     sx={{
