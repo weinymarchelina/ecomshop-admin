@@ -154,6 +154,29 @@ const EditOrder = ({ user }) => {
       };
     });
 
+    const orderOriItem = order.itemList;
+    const newProducts = products.map((productData) => {
+      const theOrderedQty = orderOriItem.find(
+        (item) => item.productId === productData._id
+      );
+
+      const currentStock =
+        productData.stockQty + theOrderedQty.quantity - productData.orderedQty;
+
+      console.log(`
+        Product name: ${productData.name}
+        Original Stock: ${productData.stockQty + theOrderedQty.quantity}
+        Purchased: ${productData.orderedQty}
+        Current Stock: ${currentStock}
+        `);
+
+      productData.stockQty = currentStock;
+
+      console.log(productData);
+      return productData;
+    });
+    console.log(newProducts);
+
     try {
       const res = await axios.post("/api/order/edit", {
         totalPrice: getSelectedTotal(products),
@@ -161,9 +184,11 @@ const EditOrder = ({ user }) => {
         itemList: newItemList,
         orderId: order._id,
         orderOriItem: order.itemList,
-        products,
+        products: newProducts,
       });
+
       console.log(res.data);
+      router("/order");
     } catch (err) {
       console.log(err.message);
       throw new Error(err.message);
@@ -419,10 +444,12 @@ const EditOrder = ({ user }) => {
                                     (item) => item.productId === product._id
                                   );
 
+                                  // const max =
+                                  //   product.stockQty < theOrderedQty.quantity
+                                  //     ? theOrderedQty.quantity
+                                  //     : product.stockQty;
                                   const max =
-                                    product.stockQty < theOrderedQty.quantity
-                                      ? theOrderedQty.quantity
-                                      : product.stockQty;
+                                    product.stockQty + theOrderedQty.quantity;
 
                                   if (value > max) value = max;
                                   if (value < min) value = min;
@@ -468,10 +495,13 @@ const EditOrder = ({ user }) => {
                                     (item) => item.productId === product._id
                                   );
 
+                                  // const max =
+                                  //   product.stockQty < theOrderedQty.quantity
+                                  //     ? theOrderedQty.quantity
+                                  //     : product.stockQty;
+
                                   const max =
-                                    product.stockQty < theOrderedQty.quantity
-                                      ? theOrderedQty.quantity
-                                      : product.stockQty;
+                                    product.stockQty + theOrderedQty.quantity;
 
                                   const updatedProducts = products.map(
                                     (item) => {
@@ -541,7 +571,7 @@ const EditOrder = ({ user }) => {
                     onClick={() => router.push("/order")}
                     variant="outlined"
                   >
-                    Cancel
+                    Back
                   </Button>
                   <Button
                     size="small"

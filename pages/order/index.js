@@ -5,6 +5,7 @@ import {
   Container,
   Typography,
   Button,
+  Modal,
 } from "@mui/material";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -12,6 +13,7 @@ import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import moment from "moment";
+import { SettingsApplications } from "@mui/icons-material";
 
 // const idLocale = require("moment/locale/id");
 // moment.locale("id", idLocale);
@@ -22,10 +24,25 @@ const formatter = new Intl.NumberFormat("id", {
   minimumFractionDigits: 0,
 });
 
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  width: "95vw",
+  maxWidth: "calc(25rem + 30vw)",
+  transform: "translate(-50%, -50%)",
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 5,
+  mr: 1,
+};
+
 const OrderList = ({ user }) => {
   const matches = useMediaQuery("(max-width:720px)");
   const stacks = useMediaQuery("(max-width:560px)");
   const [orders, setOrders] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [action, setAction] = useState({});
   const router = useRouter();
 
   useEffect(async () => {
@@ -83,9 +100,11 @@ const OrderList = ({ user }) => {
   };
   const handleCancel = (order) => {
     //
+    console.log("Cancel!");
   };
   const handleFinish = (order) => {
     //
+    console.log("Finish");
   };
 
   return (
@@ -116,6 +135,42 @@ const OrderList = ({ user }) => {
                 Transaction List
               </Typography>
             </Box>
+
+            {open && (
+              <Modal open={open} onClose={() => setOpen(false)}>
+                <Box sx={modalStyle}>
+                  <Box className="f-column">
+                    <Typography variant="h6" component="p">
+                      Are you sure to {action.name} this order?
+                    </Typography>
+                    <Typography
+                      variant="subtitle1"
+                      component="p"
+                      color="primary"
+                      sx={{ my: 3 }}
+                    >
+                      Warning: this action is irreversible!
+                    </Typography>
+                    <Box sx={{ my: 2 }}>
+                      <Button
+                        variant="outlined"
+                        sx={{ mr: 1 }}
+                        onClick={() => action.func(action.order)}
+                      >
+                        {action.name} Order
+                      </Button>
+                      <Button
+                        variant="contained"
+                        sx={{ ml: 1 }}
+                        onClick={() => setOpen(false)}
+                      >
+                        Back
+                      </Button>
+                    </Box>
+                  </Box>
+                </Box>
+              </Modal>
+            )}
 
             <Box sx={{ mt: 2 }}>
               {orders.map((order) => {
@@ -164,9 +219,6 @@ const OrderList = ({ user }) => {
                                     stacks ? "3.75rem" : "calc(5rem + 1vw)"
                                   }`,
                                   margin: "0 .5rem",
-                                  // opacity: `${
-                                  //   order.firstItem.stockQty === 0 ? 0.7 : 1
-                                  // }`,
                                 }}
                               />
                             </Box>
@@ -214,14 +266,6 @@ const OrderList = ({ user }) => {
                                   </Typography>
                                 )}
                               </Box>
-
-                              {/* <Typography variant="caption" component="p">
-                                Total:{" "}
-                                {formatter.format(
-                                  order.itemList[0].price *
-                                    order.itemList[0].quantity
-                                )}
-                              </Typography> */}
                             </Box>
                           </Box>
                           <Box
@@ -268,7 +312,6 @@ const OrderList = ({ user }) => {
                         </Box>
 
                         <Box
-                          // className="f-space"
                           sx={{
                             mt: 3,
                             display: "flex",
@@ -280,7 +323,16 @@ const OrderList = ({ user }) => {
                               <>
                                 <Button
                                   size="small"
-                                  onClick={() => handleCancel(order)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpen(true);
+                                    setAction({
+                                      name: "cancel",
+                                      func: handleCancel,
+                                      order,
+                                    });
+                                    // handleCancel(order);
+                                  }}
                                   variant="outlined"
                                 >
                                   Cancel
@@ -288,14 +340,25 @@ const OrderList = ({ user }) => {
                                 <Button
                                   size="small"
                                   variant="outlined"
-                                  onClick={() => handleEdit(order)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEdit(order);
+                                  }}
                                 >
                                   Edit
                                 </Button>
                                 <Button
                                   size="small"
                                   variant="contained"
-                                  onClick={() => handleFinish(order)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpen(true);
+                                    setAction({
+                                      name: "finish",
+                                      func: handleFinish,
+                                      order,
+                                    });
+                                  }}
                                 >
                                   Finish
                                 </Button>

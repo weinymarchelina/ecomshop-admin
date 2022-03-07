@@ -87,6 +87,16 @@ const DisplayOrder = ({ user }) => {
     }
   };
 
+  const handleEdit = (order) => {
+    router.push(`/order/edit/${order._id}`);
+  };
+  const handleCancel = (order) => {
+    //
+  };
+  const handleFinish = (order) => {
+    //
+  };
+
   return (
     <Container
       sx={{
