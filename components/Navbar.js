@@ -1,6 +1,7 @@
 import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import {
   AppBar,
@@ -14,11 +15,19 @@ import {
   Typography,
 } from "@mui/material";
 
-const links = ["Dashboard", "Products", "Order", "Report", "Settings"];
+const links = [
+  "Dashboard",
+  "Products",
+  "Order",
+  "Report",
+  "Contact",
+  "Settings",
+];
 
 const Navbar = () => {
   const { data: session } = useSession();
   const [anchorElNav, setAnchorElNav] = useState(null);
+  const router = useRouter();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -95,7 +104,7 @@ const Navbar = () => {
             </Box>
           )}
 
-          {!session && (
+          {!session && router.pathname === "/" && (
             <Button variant="outlined" color="secondary">
               <Link href="/">Set Roles</Link>
             </Button>

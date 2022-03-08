@@ -15,11 +15,12 @@ const addOrder = async (req, res) => {
     const session = await getSession({ req });
     if (!session) return res.status(400).json({ msg: "Please login first." });
 
-    const { totalPrice, totalQty, itemList, orderId, orderOriItem, products } =
-      req.body;
+    const role = session.user.role;
+    const { totalPrice, totalQty, itemList, order, products } = req.body;
 
+    console.log(role);
     await Order.updateOne(
-      { _id: orderId },
+      { _id: order._id },
       {
         totalPrice,
         totalQty,
@@ -43,9 +44,38 @@ const addOrder = async (req, res) => {
       .then(async (updateProducts) => {
         console.log(updateProducts);
 
-        const orderData = await Order.findById(orderId);
+        const orderData = await Order.findById(order._id);
         return orderData;
       });
+
+    if (role === "Owner" && order.doneStatus && order.finishDate !== "-") {
+      console.log("after order edit");
+
+      for (const item of itemList) {
+        const originalObj = order.itemList.filter(
+          (oriItem) => oriItem.productId === item.productId
+        );
+        const originalQty = originalObj[0].quantity;
+
+        const product = products.filter(
+          (product) => product._id === item.productId
+        )[0];
+        console.log(product);
+
+        const gap = item.quantity - originalQty;
+        console.log(gap);
+
+        console.log("Finish order");
+        await Product.updateOne(
+          { _id: item.productId },
+          {
+            soldQty: product.soldQty + gap,
+          }
+        );
+      }
+    } else {
+      console.log("before order edit");
+    }
 
     await res.status(200).json({
       msg: newOrder,

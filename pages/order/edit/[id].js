@@ -49,6 +49,9 @@ const EditOrder = ({ user }) => {
     try {
       const res = await axios.post("/api/order/", { orderId: id });
       const { orderData, productData } = res.data;
+      if (orderData.doneStatus && orderData.finishDate === "-") {
+        router.push(`/order/${id}`);
+      }
       const orderedProductList = orderData.itemList.map((item) => {
         const orderedProducts = productData.filter(
           (product) => product._id === item.productId
@@ -74,7 +77,7 @@ const EditOrder = ({ user }) => {
   const getStatus = (order) => {
     if (order.finishDate === "-") {
       return "Canceled";
-    } else if (order.doneStatus) {
+    } else if (order.doneStatus && order.finishDate !== "-") {
       return "Finished";
     } else {
       return "On Process";
@@ -86,7 +89,7 @@ const EditOrder = ({ user }) => {
       return {
         backgroundColor: "#ccc",
       };
-    } else if (order.doneStatus) {
+    } else if (order.doneStatus && order.finishDate !== "-") {
       return {
         backgroundColor: "#58B24D",
         color: "#fff",
@@ -189,15 +192,16 @@ const EditOrder = ({ user }) => {
         totalPrice: getSelectedTotal(products),
         totalQty: totalOrder,
         itemList: newItemList,
-        orderId: order._id,
-        orderOriItem: order.itemList,
+        order,
+        // orderOriItem: order.itemList,
         products: newProducts,
       });
 
       console.log(res.data);
-      router("/order");
+      router.push("/order");
     } catch (err) {
       console.log(err.message);
+      console.log(err.response?.data);
       throw new Error(err.message);
     }
   };
@@ -566,29 +570,31 @@ const EditOrder = ({ user }) => {
                     {subtotal}
                   </Typography>
                 </Card>
-                <Box
-                  sx={{
-                    display: "flex",
-                    mt: 3,
-                    gap: 1,
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <Button
-                    size="small"
-                    onClick={() => router.push("/order")}
-                    variant="outlined"
+                {(order.doneStatus && order.finishDate === "-") || (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      mt: 3,
+                      gap: 1,
+                      justifyContent: "flex-end",
+                    }}
                   >
-                    Back
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="contained"
-                    onClick={() => handleSave()}
-                  >
-                    Save
-                  </Button>
-                </Box>
+                    <Button
+                      size="small"
+                      onClick={() => router.push("/order")}
+                      variant="outlined"
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      onClick={() => handleSave()}
+                    >
+                      Save
+                    </Button>
+                  </Box>
+                )}
               </>
             )}
           </Box>

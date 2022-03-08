@@ -11,6 +11,7 @@ import {
   Select,
   InputLabel,
   MenuItem,
+  IconButton,
 } from "@mui/material";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -19,6 +20,7 @@ import { useRouter } from "next/router";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import moment from "moment";
 import { SettingsApplications } from "@mui/icons-material";
+import AccountBoxIcon from "@mui/icons-material/AccountBox";
 
 // const idLocale = require("moment/locale/id");
 // moment.locale("id", idLocale);
@@ -63,7 +65,7 @@ const OrderList = ({ user }) => {
   useEffect(async () => {
     try {
       const res = await axios.get("/api/data/order");
-      const { orderData, productData } = res.data;
+      const { orderData, productData, userData } = res.data;
 
       for (const order of orderData) {
         const firstProduct = productData.filter(
@@ -72,6 +74,11 @@ const OrderList = ({ user }) => {
         order.firstItemInfo = order.itemList[0];
         order.firstItem = firstProduct[0];
         order.productQty = order.itemList.length;
+
+        const theUser = userData.filter(
+          (user) => user._id === order.customerId
+        );
+        if (theUser[0]) order.customName = theUser[0].contactInfo.name;
 
         for (const item of order.itemList) {
           const product = productData.filter(
@@ -127,7 +134,7 @@ const OrderList = ({ user }) => {
         case "Today":
           filteredOrders = searchedOrder.filter(
             (order) =>
-              moment(order.createdAt).format("LL") ===
+              moment(new Date(order.createdAt)).format("LL") ===
               moment(new Date()).format("LL")
           );
 
@@ -142,9 +149,9 @@ const OrderList = ({ user }) => {
               .endOf("week")
               .format("lll");
 
-            const orderDate = moment(order.createdAt).format("lll");
+            const orderDate = moment(new Date(order.createdAt)).format("lll");
 
-            return moment(orderDate).isBetween(
+            return moment(new Date(orderDate)).isBetween(
               startDayOfPrevWeek,
               lastDayOfPrevWeek
             );
@@ -161,9 +168,12 @@ const OrderList = ({ user }) => {
               .endOf("month")
               .format("lll");
 
-            const orderDate = moment(order.createdAt).format("lll");
+            const orderDate = moment(new Date(order.createdAt)).format("lll");
 
-            return moment(orderDate).isBetween(startDayOfMonth, lastDayOfMonth);
+            return moment(new Date(orderDate)).isBetween(
+              startDayOfMonth,
+              lastDayOfMonth
+            );
           });
 
           break;
@@ -184,7 +194,7 @@ const OrderList = ({ user }) => {
   const getStatus = (order) => {
     if (order.finishDate === "-") {
       return "Canceled";
-    } else if (order.doneStatus) {
+    } else if (order.doneStatus && order.finishDate !== "-") {
       return "Finished";
     } else {
       return "On Process";
@@ -196,7 +206,7 @@ const OrderList = ({ user }) => {
       return {
         backgroundColor: "#ccc",
       };
-    } else if (order.doneStatus) {
+    } else if (order.doneStatus && order.finishDate !== "-") {
       return {
         backgroundColor: "#58B24D",
         color: "#fff",
@@ -216,13 +226,15 @@ const OrderList = ({ user }) => {
     console.log("Cancel!");
     try {
       const res = await axios.post("/api/order/done", {
-        orderId: order._id,
+        order,
         done: false,
       });
       const { msg } = res.data;
       console.log(msg);
+      window.location.reload();
     } catch (err) {
       console.log(err.message);
+      console.log(err.response.data);
       throw new Error(err.message);
     }
   };
@@ -231,13 +243,15 @@ const OrderList = ({ user }) => {
     console.log("Finish");
     try {
       const res = await axios.post("/api/order/done", {
-        orderId: order._id,
+        order,
         done: true,
       });
       const { msg } = res.data;
       console.log(msg);
+      window.location.reload();
     } catch (err) {
       console.log(err.message);
+      console.log(err.response.data);
       throw new Error(err.message);
     }
   };
@@ -281,6 +295,9 @@ const OrderList = ({ user }) => {
                     className="f-space"
                     sx={{ flex: 2, gap: 3, width: "100%" }}
                   >
+                    {/* <IconButton>
+                      <AccountBoxIcon />
+                    </IconButton> */}
                     <FormControl variant="standard" sx={{ flex: 1 }}>
                       <InputLabel>Filter</InputLabel>
                       <Select
@@ -305,7 +322,7 @@ const OrderList = ({ user }) => {
                   </Box>
                   <TextField
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    label="Search"
+                    label="Search Customer"
                     variant="standard"
                     sx={{ flex: 2, pt: 0.65 }}
                     autoComplete="off"
@@ -376,7 +393,10 @@ const OrderList = ({ user }) => {
                             style={{ borderBottom: "1px solid #ccc" }}
                           >
                             <Typography variant="caption" component="p">
-                              Order from {order.customerName}
+                              Order from{" "}
+                              {order.customName
+                                ? order.customName
+                                : order.customerName}
                             </Typography>
                           </Box>
                           <Box className={stacks ? "f-col" : "f-space"}>
@@ -522,16 +542,18 @@ const OrderList = ({ user }) => {
                                   >
                                     Cancel
                                   </Button>
-                                  <Button
-                                    size="small"
-                                    variant="outlined"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleEdit(order);
-                                    }}
-                                  >
-                                    Edit
-                                  </Button>
+                                  {order.finishDate === "-" || (
+                                    <Button
+                                      size="small"
+                                      variant="outlined"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEdit(order);
+                                      }}
+                                    >
+                                      Edit
+                                    </Button>
+                                  )}
                                   <Button
                                     size="small"
                                     variant="contained"
@@ -549,15 +571,20 @@ const OrderList = ({ user }) => {
                                   </Button>
                                 </>
                               )}
-                              {order.doneStatus && user.role === "Owner" && (
-                                <Button
-                                  size="small"
-                                  variant="outlined"
-                                  onClick={() => handleEdit(order)}
-                                >
-                                  Edit
-                                </Button>
-                              )}
+                              {order.doneStatus &&
+                                order.finishDate !== "-" &&
+                                user.role === "Owner" && (
+                                  <Button
+                                    size="small"
+                                    variant="outlined"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleEdit(order);
+                                    }}
+                                  >
+                                    Edit
+                                  </Button>
+                                )}
                             </Box>
                           </Box>
                         </CardContent>

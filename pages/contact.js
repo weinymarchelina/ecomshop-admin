@@ -12,94 +12,60 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { getSession, signOut } from "next-auth/react";
+import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import ErrorWarning from "../../components/ErrorWarning";
+import EditIcon from "@mui/icons-material/Edit";
 
-const BusinessCategory = ({ user }) => {
+const Contact = () => {
   const matches = useMediaQuery("(max-width:720px)");
-  const [products, setProducts] = useState([]);
-  const [newCategory, setNewCategory] = useState("");
-  const [categoryList, setCategoryList] = useState([]);
-  const [error, setError] = useState(null);
   const router = useRouter();
+  const [userList, setUserList] = useState();
+  const [error, setError] = useState(null);
+  const [selectedUser, setSelectedUser] = useState({});
+  const [selectedName, setSelectedName] = useState("");
 
   useEffect(async () => {
     try {
-      const res = await axios.get("/api/products");
-      const { businessCategory, userStatus, productData } = res.data;
-      if (!userStatus) {
-        signOut({ callbackUrl: `${window.location.origin}/` });
-      }
+      const res = await axios.get("/api/data/users");
+      const { users } = res.data;
 
-      setCategoryList(businessCategory);
-      console.log(businessCategory);
-      setProducts(productData);
-      console.log(productData);
+      setUserList(users);
+      console.log(users);
     } catch (err) {
       console.log(err.message);
+      console.log(err.response.data);
       throw new Error(err.message);
     }
   }, []);
 
-  const addCategory = () => {
-    const sameCategory = categoryList.find(
-      (category) => newCategory.toLowerCase() === category.name.toLowerCase()
-    );
-    if (sameCategory) {
-      setError("This category already exists");
-      return;
-    }
+  const handleRename = () => {
+    const newList = userList.map((user) => {
+      if (user._id === selectedUser._id) {
+        user.contactInfo?.name = selectedName;
+      }
 
-    setCategoryList((prevCategory) => [
-      ...prevCategory,
-      {
-        name: newCategory,
-        _id: newCategory + Math.random(),
-      },
-    ]);
-    setNewCategory("");
-    setError(null);
-  };
-
-  const deleteCategory = (selectedCategory) => {
-    const categoryUsed = products.filter((product) => {
-      return selectedCategory.name === product.category.name;
+      return user;
     });
-    if (categoryUsed[0]) {
-      return setError(
-        "Cannot delete category because the selected category is still being used in the product"
-      );
-    }
 
-    const newCategoryList = categoryList.filter(
-      (eachCategory) => selectedCategory.name !== eachCategory.name
-    );
+ 
+    setUserList(newList);
+    console.log(newList)
 
-    setCategoryList(newCategoryList);
-    setError(null);
+    setSelectedName('')
+    setSelectedUser({})
   };
 
   const handleSave = async () => {
+      console.log(userList)
     try {
-      const nameArr = categoryList
-        .map((category) => category.name)
-        .sort((a, b) => {
-          const textA = a.toUpperCase();
-          const textB = b.toUpperCase();
-          return textA < textB ? -1 : textA > textB ? 1 : 0;
-        });
-      const res = await axios.post("/api/products/category", nameArr);
-
-      console.log(res);
-      router.push("/products");
-    } catch (err) {
-      console.log(err.message);
-      console.log(err.response?.data);
-      throw new Error(err.message);
-    }
+        await axios.post("/api/data/contact", userList);
+        router.push('/order')
+      } catch (err) {
+        console.log(err.response.data);
+        console.log(err.message);
+        throw new Error(err.message);
+      }
   };
 
   return (
@@ -109,7 +75,7 @@ const BusinessCategory = ({ user }) => {
       }}
       maxWidth={matches ? "sm" : "lg"}
     >
-      {categoryList && (
+      {userList && (
         <Card className="f-row" variant="outlined" size="small">
           <CardContent className="f-col" sx={{ px: 5, width: "100%" }}>
             <Box
@@ -121,9 +87,10 @@ const BusinessCategory = ({ user }) => {
               }}
             >
               <Typography className="main-title" variant="h5" component="h2">
-                Category List
+                Contact List
               </Typography>
             </Box>
+
             <Box
               className="f-space"
               style={{
@@ -140,18 +107,30 @@ const BusinessCategory = ({ user }) => {
               }}
             >
               <TextField
-                label="New Category"
+                label="Custom Name"
+                placeholder={
+                  selectedUser.name
+                    ? `Custom name for ${selectedUser.name}`
+                    : ""
+                }
                 type="text"
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
+                value={selectedName}
+                onChange={(e) => setSelectedName(e.target.value)}
                 variant="standard"
                 fullWidth
                 autoComplete="off"
+                required
               />
-              <Button onClick={addCategory} variant="contained" size="small">
-                Add
+              <Button
+                disabled={selectedUser?._id ? false : true}
+                onClick={handleRename}
+                variant="contained"
+                size="small"
+              >
+                Rename
               </Button>
             </Box>
+
             {error && (
               <Box
                 style={{ border: "1px solid firebrick", borderRadius: "0.5vw" }}
@@ -160,10 +139,10 @@ const BusinessCategory = ({ user }) => {
                 <ErrorWarning error={error} />
               </Box>
             )}
-            <List>
-              {categoryList.map((category) => (
+            <List sx={{ mb: 3 }}>
+              {userList.map((user) => (
                 <ListItem
-                  key={category.name}
+                  key={user._id}
                   sx={{ py: 0, px: 2 }}
                   style={{
                     border: "1px solid #ddd",
@@ -171,19 +150,45 @@ const BusinessCategory = ({ user }) => {
                     display: "flex",
                   }}
                 >
-                  <Typography
+                  <Box
                     sx={{
                       flex: 19,
-                      letterSpacing: `${matches ? "0" : "1px"}`,
+                      py: 0.5,
                     }}
+                    className="f-col"
                   >
-                    {category.name}
-                  </Typography>
+                    <Typography
+                      sx={{
+                        letterSpacing: `${matches ? "0" : "1px"}`,
+                        fontSize: `${user.contactInfo?.name ? "10px" : "16px"}`,
+                      }}
+                      variant={user.contactInfo?.name ? "caption" : "body1"}
+                    >
+                      {user.name}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        mt: 0.25,
+                        letterSpacing: `${matches ? "0" : "1px"}`,
+                      }}
+                    >
+                      {user.contactInfo?.name}
+                    </Typography>
+                  </Box>
                   <ListItemButton
                     sx={{ px: 1, flex: 1 }}
-                    onClick={() => deleteCategory(category)}
+                    onClick={() => {
+                        setSelectedName('')
+                        setSelectedUser(user)
+
+                        if (user.contactInfo.name) {
+                            setSelectedName(user.contactInfo.name)
+                        }
+                    }}
                   >
-                    <RemoveCircleIcon color="primary" />
+                    <EditIcon
+                      color={selectedUser._id === user._id ? "primary" : ""}
+                    />
                   </ListItemButton>
                 </ListItem>
               ))}
@@ -224,7 +229,7 @@ const BusinessCategory = ({ user }) => {
   );
 };
 
-export default BusinessCategory;
+export default Contact;
 
 export async function getServerSideProps(context) {
   const session = await getSession(context);

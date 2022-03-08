@@ -299,7 +299,7 @@ const Product = ({ user }) => {
                       {selectedProduct.activeStatus && (
                         <Box className="f-column">
                           <Typography variant="h6" component="p">
-                            Please deactive {selectedProduct.name} before
+                            Please deactivate {selectedProduct.name} before
                             deleting it
                           </Typography>
                           <Typography

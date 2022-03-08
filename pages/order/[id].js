@@ -70,7 +70,7 @@ const DisplayOrder = ({ user }) => {
   const getStatus = (order) => {
     if (order.finishDate === "-") {
       return "Canceled";
-    } else if (order.doneStatus) {
+    } else if (order.doneStatus && order.finishDate !== "-") {
       return "Finished";
     } else {
       return "On Process";
@@ -82,7 +82,7 @@ const DisplayOrder = ({ user }) => {
       return {
         backgroundColor: "#ccc",
       };
-    } else if (order.doneStatus) {
+    } else if (order.doneStatus && order.finishDate !== "-") {
       return {
         backgroundColor: "#58B24D",
         color: "#fff",
@@ -97,13 +97,40 @@ const DisplayOrder = ({ user }) => {
   const handleEdit = (order) => {
     router.push(`/order/edit/${order._id}`);
   };
-  const handleCancel = (order) => {
-    //
-  };
-  const handleFinish = (order) => {
-    //
+
+  const handleCancel = async (order) => {
+    console.log("Cancel!");
+    try {
+      const res = await axios.post("/api/order/done", {
+        order,
+        done: false,
+      });
+      const { msg } = res.data;
+      window.location.reload();
+      console.log(msg);
+    } catch (err) {
+      console.log(err.message);
+      console.log(err.response.data);
+      throw new Error(err.message);
+    }
   };
 
+  const handleFinish = async (order) => {
+    console.log("Finish");
+    try {
+      const res = await axios.post("/api/order/done", {
+        order,
+        done: true,
+      });
+      const { msg } = res.data;
+      console.log(msg);
+      window.location.reload();
+    } catch (err) {
+      console.log(err.message);
+      console.log(err.response.data);
+      throw new Error(err.message);
+    }
+  };
   return (
     <Container
       sx={{
@@ -294,7 +321,7 @@ const DisplayOrder = ({ user }) => {
                     variant={stacks ? "caption" : "body1"}
                     textAlign="right"
                   >
-                    {moment(order.createdAt).format("LLL")}
+                    {moment(new Date(order.createdAt)).format("LLL")}
                   </Typography>
                 </Card>
 
@@ -316,7 +343,7 @@ const DisplayOrder = ({ user }) => {
                       variant={stacks ? "caption" : "body1"}
                       textAlign="right"
                     >
-                      {moment(order.finishDate).format("LLL")}
+                      {moment(new Date(order.finishDate)).format("LLL")}
                     </Typography>
                   </Card>
                 )}
@@ -399,36 +426,63 @@ const DisplayOrder = ({ user }) => {
                     <>
                       <Button
                         size="small"
-                        onClick={() => handleCancel(order)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpen(true);
+                          setAction({
+                            name: "cancel",
+                            func: handleCancel,
+                            order,
+                          });
+                          // handleCancel(order);
+                        }}
                         variant="outlined"
                       >
                         Cancel
                       </Button>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() => handleEdit(order)}
-                      >
-                        Edit
-                      </Button>
+                      {order.finishDate === "-" || (
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(order);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                      )}
                       <Button
                         size="small"
                         variant="contained"
-                        onClick={() => handleFinish(order)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpen(true);
+                          setAction({
+                            name: "finish",
+                            func: handleFinish,
+                            order,
+                          });
+                        }}
                       >
                         Finish
                       </Button>
                     </>
                   )}
-                  {order.doneStatus && user.role === "Owner" && (
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => handleEdit(order)}
-                    >
-                      Edit
-                    </Button>
-                  )}
+                  {order.doneStatus &&
+                    order.finishDate !== "-" &&
+                    user.role === "Owner" && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(order);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    )}
                 </Box>
               </>
             )}

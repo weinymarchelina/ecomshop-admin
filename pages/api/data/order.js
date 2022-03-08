@@ -1,6 +1,7 @@
 import dbConnect from "../../../db/database";
 import Order from "../../../models/order";
 import Product from "../../../models/product";
+import User from "../../../models/user";
 import { getSession } from "next-auth/react";
 
 dbConnect();
@@ -24,9 +25,15 @@ const getOrder = async (req, res) => {
       businessId,
     });
 
+    // const userData = await User.find({
+    //   businessId,
+    // });
+    const userData = await User.find();
+
     res.status(200).json({
       orderData,
       productData,
+      userData,
     });
   } catch (err) {
     return res.status(500).json(err.message);

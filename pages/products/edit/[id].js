@@ -55,6 +55,7 @@ const EditProduct = ({ user }) => {
   const [imgError, setImgError] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [switchStatus, setSwitchStatus] = useState(false);
 
   useEffect(async () => {
     try {
@@ -67,6 +68,12 @@ const EditProduct = ({ user }) => {
         signOut({ callbackUrl: `${window.location.origin}/` });
       }
 
+      const res2 = await axios.post("/api/products/isUsedCheck", {
+        productId: id,
+      });
+      const { isUsed } = res2.data;
+      console.log(isUsed);
+
       console.log(productData);
       setProduct(productData);
       setActive(productData.activeStatus);
@@ -76,6 +83,7 @@ const EditProduct = ({ user }) => {
       setStockQty(productData.stockQty);
       setWarningQty(productData.warningQty);
       setCategoryList(allCategory);
+      setSwitchStatus(isUsed);
 
       const theCategory = allCategory.find(
         (category) => category.name === productData.category.name
@@ -509,6 +517,7 @@ const EditProduct = ({ user }) => {
                   sx={{ m: 0 }}
                   control={
                     <Switch
+                      disabled={switchStatus}
                       checked={active}
                       onChange={(e) => setActive(e.target.checked)}
                     />

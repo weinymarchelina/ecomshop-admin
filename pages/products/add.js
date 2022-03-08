@@ -119,6 +119,7 @@ const AddProduct = ({ user }) => {
         activeStatus: active,
         price: priceList,
         businessId: user.businessId,
+        soldQty: 0,
       };
 
       console.log(product);
