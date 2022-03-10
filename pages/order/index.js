@@ -44,6 +44,15 @@ const modalStyle = {
   mr: 1,
 };
 
+const startDayWeek = moment(new Date()).startOf("week").format("MMM Do");
+const lastDayWeek = moment(new Date()).endOf("week").format("MMM Do");
+const startDayMonth = moment(new Date()).startOf("month").format("MMM Do");
+const lastDayMonth = moment(new Date()).endOf("month").format("MMM Do");
+const startDayOfPrevWeek = moment(new Date()).startOf("week").format("lll");
+const lastDayOfPrevWeek = moment(new Date()).endOf("week").format("lll");
+const startDayOfMonth = moment(new Date()).startOf("month").format("lll");
+const lastDayOfMonth = moment(new Date()).endOf("month").format("lll");
+
 const OrderList = ({ user }) => {
   const matches = useMediaQuery("(max-width:720px)");
   const stacks = useMediaQuery("(max-width:560px)");
@@ -57,8 +66,8 @@ const OrderList = ({ user }) => {
     "Finished",
     "Canceled",
     "Today",
-    "This Week",
-    "This Month",
+    `This Week (${startDayWeek} - ${lastDayWeek})`,
+    `This Month (${startDayMonth} - ${lastDayMonth})`,
   ];
   const router = useRouter();
 
@@ -98,19 +107,30 @@ const OrderList = ({ user }) => {
   }, []);
 
   const searchOrder = () => {
-    if (filter === "All") return orders;
-    else if (searchTerm) {
-      return orders.filter((order) =>
-        order.customerName.toLowerCase().includes(searchTerm)
-      );
-    } else return orders;
+    // console.log(searchTerm);
+    if (searchTerm) {
+      const getOrders = orders.filter((order) => {
+        const name = order.customName ? order.customName : order.customName;
+
+        console.log(name.toLowerCase().includes(searchTerm));
+        return name.toLowerCase().includes(searchTerm);
+      });
+
+      // console.log("Test");
+      // console.log(getOrders);
+      return getOrders;
+    } else if (filter === "All") return orders;
+    else return orders;
   };
 
   const searchedOrder = searchOrder();
 
   const filterOrders = () => {
     let filteredOrders;
-    if (searchedOrder) {
+    console.log("filtered");
+    console.log(searchedOrder);
+    console.log(filter);
+    if (filter !== "All") {
       switch (filter) {
         case "Unfinished":
           filteredOrders = searchedOrder.filter((order) => !order.doneStatus);
@@ -142,13 +162,6 @@ const OrderList = ({ user }) => {
 
         case "This Week":
           filteredOrders = searchedOrder.filter((order) => {
-            const startDayOfPrevWeek = moment(new Date())
-              .startOf("week")
-              .format("lll");
-            const lastDayOfPrevWeek = moment(new Date())
-              .endOf("week")
-              .format("lll");
-
             const orderDate = moment(new Date(order.createdAt)).format("lll");
 
             return moment(new Date(orderDate)).isBetween(
@@ -161,13 +174,6 @@ const OrderList = ({ user }) => {
 
         case "This Month":
           filteredOrders = searchedOrder.filter((order) => {
-            const startDayOfMonth = moment(new Date())
-              .startOf("month")
-              .format("lll");
-            const lastDayOfMonth = moment(new Date())
-              .endOf("month")
-              .format("lll");
-
             const orderDate = moment(new Date(order.createdAt)).format("lll");
 
             return moment(new Date(orderDate)).isBetween(
@@ -183,6 +189,8 @@ const OrderList = ({ user }) => {
 
           break;
       }
+    } else if (searchTerm && filter === "All") {
+      filteredOrders = searchedOrder;
     } else {
       filteredOrders = orders;
     }

@@ -1,5 +1,6 @@
 import dbConnect from "../../../db/database";
 import Order from "../../../models/order";
+import User from "../../../models/user";
 import { getSession } from "next-auth/react";
 import Product from "../../../models/product";
 
@@ -38,6 +39,7 @@ const finishOrder = async (req, res) => {
       const product = await Product.findOne({
         _id: item.productId,
       });
+      console.log(product);
 
       if (finishDate !== "-") {
         console.log("Finish order");
@@ -66,6 +68,24 @@ const finishOrder = async (req, res) => {
           }
         );
       }
+    }
+
+    if (finishDate !== "-") {
+      const userObj = await User.findOne({
+        _id: order.customerId,
+      });
+
+      let lastTotalOrder = userObj.totalOrder;
+      let lastTotalItem = userObj.totalItem;
+      let lastTotalPaid = userObj.totalPaid;
+      await User.updateOne(
+        { _id: order.customerId },
+        {
+          totalOrder: (lastTotalOrder += 1),
+          totalItem: lastTotalItem + order.totalQty,
+          totalPaid: lastTotalPaid + order.totalPrice,
+        }
+      );
     }
 
     res.status(200).json({

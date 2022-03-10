@@ -1,4 +1,5 @@
 import { Container } from "@mui/material";
+import { getSession } from "next-auth/react";
 
 const ProductDisplay = ({ user }) => {
   return <Container></Container>;

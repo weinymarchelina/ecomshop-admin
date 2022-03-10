@@ -21,7 +21,6 @@ const Contact = () => {
   const matches = useMediaQuery("(max-width:720px)");
   const router = useRouter();
   const [userList, setUserList] = useState();
-  const [error, setError] = useState(null);
   const [selectedUser, setSelectedUser] = useState({});
   const [selectedName, setSelectedName] = useState("");
 
@@ -29,9 +28,14 @@ const Contact = () => {
     try {
       const res = await axios.get("/api/data/users");
       const { users } = res.data;
+      const usersData = users.sort((a, b) => {
+        const textA = a.name.toUpperCase();
+        const textB = b.name.toUpperCase();
+        return textA < textB ? -1 : textA > textB ? 1 : 0;
+      });
 
-      setUserList(users);
-      console.log(users);
+      setUserList(usersData);
+      console.log(usersData);
     } catch (err) {
       console.log(err.message);
       console.log(err.response.data);
@@ -131,14 +135,7 @@ const Contact = () => {
               </Button>
             </Box>
 
-            {error && (
-              <Box
-                style={{ border: "1px solid firebrick", borderRadius: "0.5vw" }}
-                sx={{ pb: 2, px: 2 }}
-              >
-                <ErrorWarning error={error} />
-              </Box>
-            )}
+         
             <List sx={{ mb: 3 }}>
               {userList.map((user) => (
                 <ListItem

@@ -26,6 +26,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { useRouter } from "next/router";
 import ClassIcon from "@mui/icons-material/Class";
+import BoltIcon from "@mui/icons-material/Bolt";
 
 const modalStyle = {
   position: "absolute",
@@ -221,6 +222,11 @@ const Product = ({ user }) => {
                 Product List
               </Typography>
               <Box>
+                <IconButton color="primary">
+                  <Link href={"/products/quickEdit"}>
+                    <BoltIcon sx={{ fontSize: 32 }} />
+                  </Link>
+                </IconButton>
                 <IconButton color="primary">
                   <Link href={"/products/category"}>
                     <ClassIcon sx={{ fontSize: 32 }} />

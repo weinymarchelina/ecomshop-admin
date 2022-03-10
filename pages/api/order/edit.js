@@ -1,6 +1,7 @@
 import dbConnect from "../../../db/database";
 import Product from "../../../models/product";
 import Order from "../../../models/order";
+import User from "../../../models/user";
 import { getSession } from "next-auth/react";
 import axios from "axios";
 
@@ -75,6 +76,27 @@ const addOrder = async (req, res) => {
       }
     } else {
       console.log("before order edit");
+    }
+
+    if (role === "Owner" && order.doneStatus && order.finishDate !== "-") {
+      const userObj = await User.findOne({
+        _id: order.customerId,
+      });
+
+      let lastTotalItem = userObj.totalItem;
+      let lastTotalPaid = userObj.totalPaid;
+
+      const qtyGap = totalQty - order.totalQty;
+      const priceGap = totalPrice - order.totalPrice;
+      console.log(order.totalQty);
+      console.log(qtyGap);
+      await User.updateOne(
+        { _id: order.customerId },
+        {
+          totalItem: lastTotalItem + qtyGap,
+          totalPaid: lastTotalPaid + priceGap,
+        }
+      );
     }
 
     await res.status(200).json({
