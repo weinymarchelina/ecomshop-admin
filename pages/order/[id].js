@@ -12,6 +12,7 @@ import {
   Input,
   Select,
   MenuItem,
+  Modal,
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { getSession } from "next-auth/react";
@@ -23,12 +24,27 @@ import moment from "moment";
 // const idLocale = require("moment/locale/id");
 // moment.locale("id", idLocale);
 
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  width: "95vw",
+  maxWidth: "calc(25rem + 30vw)",
+  transform: "translate(-50%, -50%)",
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 5,
+  mr: 1,
+};
+
 const DisplayOrder = ({ user }) => {
   const router = useRouter();
   const { id } = router.query;
 
   const [order, setOrder] = useState(null);
   const [products, setProducts] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [action, setAction] = useState({});
   const switchNav = useMediaQuery("(max-width:900px)");
   const matches = useMediaQuery("(max-width:720px)");
   const stacks = useMediaQuery("(max-width:560px)");
@@ -106,7 +122,7 @@ const DisplayOrder = ({ user }) => {
         done: false,
       });
       const { msg } = res.data;
-      window.location.reload();
+      router.push("/order");
       console.log(msg);
     } catch (err) {
       console.log(err.message);
@@ -124,7 +140,7 @@ const DisplayOrder = ({ user }) => {
       });
       const { msg } = res.data;
       console.log(msg);
-      window.location.reload();
+      router.push("/order");
     } catch (err) {
       console.log(err.message);
       console.log(err.response.data);
@@ -282,6 +298,45 @@ const DisplayOrder = ({ user }) => {
                 );
               })}
             </Box>
+            {open && (
+              <Modal open={open} onClose={() => setOpen(false)}>
+                <Box sx={modalStyle}>
+                  <Box className="f-column">
+                    <Typography variant="h6" component="p">
+                      Are you sure to {action.name} this order?
+                    </Typography>
+                    <Typography
+                      variant="subtitle1"
+                      component="p"
+                      color="primary"
+                      sx={{ my: 3 }}
+                    >
+                      Warning: this action is irreversible!
+                    </Typography>
+                    <Box sx={{ my: 2 }}>
+                      <Button
+                        variant="outlined"
+                        sx={{ mr: 1 }}
+                        onClick={(e) => {
+                          e.target.disabled = true;
+                          console.log(e.target.disabled);
+                          action.func(action.order);
+                        }}
+                      >
+                        {action.name} Order
+                      </Button>
+                      <Button
+                        variant="contained"
+                        sx={{ ml: 1 }}
+                        onClick={() => setOpen(false)}
+                      >
+                        Back
+                      </Button>
+                    </Box>
+                  </Box>
+                </Box>
+              </Modal>
+            )}
             {order && (
               <>
                 <Card

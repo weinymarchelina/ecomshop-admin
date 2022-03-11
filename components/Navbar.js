@@ -16,11 +16,11 @@ import {
 } from "@mui/material";
 
 const links = [
-  "Dashboard",
-  "Products",
+  // "Dashboard",
   "Order",
-  "Report",
+  "Products",
   "Contact",
+  "Report",
   "Settings",
 ];
 
@@ -86,7 +86,9 @@ const Navbar = () => {
                 >
                   {links.map((link) => (
                     <MenuItem key={link} onClick={handleCloseNavMenu}>
-                      <Link href={`/${link.toLowerCase()}`}>{link}</Link>
+                      <Link href={`/${link.toLowerCase()}`}>
+                        {link.toUpperCase()}
+                      </Link>
                     </MenuItem>
                   ))}
                 </Menu>
@@ -97,8 +99,13 @@ const Navbar = () => {
           {session && (
             <Box sx={{ flexGrow: 0, display: { xs: "none", md: "flex" } }}>
               {links.map((link) => (
-                <Typography sx={{ paddingLeft: 2 }} key={link}>
-                  <Link href={`/${link.toLowerCase()}`}>{link}</Link>
+                <Typography
+                  sx={{ paddingLeft: 2, letterSpacing: "1px" }}
+                  key={link}
+                >
+                  <Link href={`/${link.toLowerCase()}`}>
+                    {link.toUpperCase()}
+                  </Link>
                 </Typography>
               ))}
             </Box>

@@ -43,7 +43,7 @@ const Settings = ({ user }) => {
   const [modal, setModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [successMsg, setSuccessMsg] = useState(null);
-  const [promoted, setPromoted] = useState(null);
+  const [promoted, setPromoted] = useState(false);
 
   const [newPassword, setNewPassword] = useState("");
   const [oldPassword, setOldPassword] = useState("");
@@ -105,6 +105,8 @@ const Settings = ({ user }) => {
 
   const handlePassword = async (e) => {
     e.preventDefault();
+    e.target.disabled = true;
+    console.log(e.target.disabled);
 
     if (newPassword !== confirmPassword) {
       setPasswordError(`New password and confirm new password don't match`);
@@ -130,6 +132,8 @@ const Settings = ({ user }) => {
 
   const handleEdit = async (e) => {
     e.preventDefault();
+    e.target.disabled = true;
+    console.log(e.target.disabled);
 
     if (!name && !phone & !email) {
       setError(`Please input at least one of the fields`);
@@ -372,7 +376,12 @@ const Settings = ({ user }) => {
 
       {business && (
         <>
-          <Modal open={promoted}>
+          <Modal
+            open={promoted}
+            onClose={() => {
+              signOut({ callbackUrl: `${window.location.origin}/` });
+            }}
+          >
             <Box sx={modalStyle} className="f-col">
               <Typography variant="h6" component="p">
                 Congratulations! You have been promoted as the new owner of{" "}
@@ -734,7 +743,7 @@ const Settings = ({ user }) => {
                         })
                         .map((member) => {
                           return (
-                            <>
+                            <Box key={member.userId}>
                               <ListItem
                                 key={member.userId}
                                 sx={{
@@ -863,7 +872,7 @@ const Settings = ({ user }) => {
                                   <PasswordChecker props={propsResign} />
                                 )}
                               </Box>
-                            </>
+                            </Box>
                           );
                         })}
                     </List>

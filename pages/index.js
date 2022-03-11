@@ -97,7 +97,7 @@ export async function getServerSideProps(context) {
   if (session) {
     return {
       redirect: {
-        destination: "/products",
+        destination: "/order",
         permanent: false,
       },
     };

@@ -106,6 +106,10 @@ const EmployeeList = (propsRole) => {
                   fontSize: `${matches ? "calc(0.35rem + 1vw)" : ""}`,
                   padding: `${matches ? " 0.35rem" : ""}`,
                 }}
+                onClick={(e) => {
+                  e.target.disabled = true;
+                  console.log(e.target.disabled);
+                }}
                 type="submit"
               >
                 Change

@@ -507,11 +507,6 @@ const EditOrder = ({ user }) => {
                                     (item) => item.productId === product._id
                                   );
 
-                                  // const max =
-                                  //   product.stockQty < theOrderedQty.quantity
-                                  //     ? theOrderedQty.quantity
-                                  //     : product.stockQty;
-
                                   const max =
                                     product.stockQty + theOrderedQty.quantity;
 
@@ -589,7 +584,11 @@ const EditOrder = ({ user }) => {
                     <Button
                       size="small"
                       variant="contained"
-                      onClick={() => handleSave()}
+                      onClick={(e) => {
+                        e.target.disabled = true;
+                        console.log(e.target.disabled);
+                        handleSave();
+                      }}
                     >
                       Save
                     </Button>

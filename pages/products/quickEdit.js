@@ -260,7 +260,11 @@ const QuickEdit = ({ user }) => {
                   width: `${matches ? "100%" : "auto"}`,
                 }}
                 variant="contained"
-                onClick={handleSave}
+                onClick={(e) => {
+                  e.target.disabled = true;
+                  console.log(e.target.disabled);
+                  handleSave();
+                }}
               >
                 Save
               </Button>

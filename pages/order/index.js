@@ -359,7 +359,11 @@ const OrderList = ({ user }) => {
                       <Button
                         variant="outlined"
                         sx={{ mr: 1 }}
-                        onClick={() => action.func(action.order)}
+                        onClick={(e) => {
+                          e.target.disabled = true;
+                          console.log(e.target.disabled);
+                          action.func(action.order);
+                        }}
                       >
                         {action.name} Order
                       </Button>

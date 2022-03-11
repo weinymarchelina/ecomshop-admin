@@ -117,6 +117,8 @@ const EditProduct = ({ user }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    e.target.disabled = true;
+    console.log(e.target.disabled);
 
     if (imgPath.length === 0) {
       setImgError("Please upload an image");

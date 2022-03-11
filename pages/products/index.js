@@ -304,7 +304,11 @@ const Product = ({ user }) => {
                     <Box sx={modalStyle}>
                       {selectedProduct.activeStatus && (
                         <Box className="f-column">
-                          <Typography variant="h6" component="p">
+                          <Typography
+                            variant="h6"
+                            component="p"
+                            textAlign="center"
+                          >
                             Please deactivate {selectedProduct.name} before
                             deleting it
                           </Typography>
@@ -340,7 +344,11 @@ const Product = ({ user }) => {
                             <Button
                               variant="outlined"
                               sx={{ mr: 1 }}
-                              onClick={handleDelete}
+                              onClick={(e) => {
+                                e.target.disabled = true;
+                                console.log(e.target.disabled);
+                                handleDelete();
+                              }}
                             >
                               Delete
                             </Button>

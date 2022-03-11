@@ -203,7 +203,11 @@ const Contact = () => {
                   width: `${matches ? "100%" : "auto"}`,
                 }}
                 variant="contained"
-                onClick={handleSave}
+                onClick={(e) => {
+                  e.target.disabled = true;
+                  console.log(e.target.disabled);
+                  handleSave()
+                }}
               >
                 Save
               </Button>
@@ -214,9 +218,9 @@ const Contact = () => {
                 }}
                 style={{ marginLeft: `${matches ? "0" : ".5rem"}` }}
                 variant="outlined"
-                onClick={() => router.push("/products")}
+                onClick={() => router.push("/order")}
               >
-                Cancel
+                Back
               </Button>
             </Box>
           </CardContent>
