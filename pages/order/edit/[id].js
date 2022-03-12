@@ -282,7 +282,7 @@ const EditOrder = ({ user }) => {
                       },
                     }}
                     key={product._id}
-                    onClick={() => router.push(`/store/${product._id}`)}
+                    onClick={() => router.push(`/products`)}
                   >
                     <Card
                       variant="outlined"

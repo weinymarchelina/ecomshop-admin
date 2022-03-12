@@ -160,7 +160,7 @@ const OrderList = ({ user }) => {
 
           break;
 
-        case "This Week":
+        case `This Week (${startDayWeek} - ${lastDayWeek})`:
           filteredOrders = searchedOrder.filter((order) => {
             const orderDate = moment(new Date(order.createdAt)).format("lll");
 
@@ -172,7 +172,7 @@ const OrderList = ({ user }) => {
 
           break;
 
-        case "This Month":
+        case `This Month (${startDayMonth} - ${lastDayMonth})`:
           filteredOrders = searchedOrder.filter((order) => {
             const orderDate = moment(new Date(order.createdAt)).format("lll");
 
@@ -621,7 +621,7 @@ export async function getServerSideProps(context) {
   if (!session) {
     return {
       redirect: {
-        destination: "/store",
+        destination: "/",
         permanent: false,
       },
     };
