@@ -20,7 +20,7 @@ const getProduct = async (req, res) => {
 
     let isUsed = false;
     // const orders = await Order.find({ businessId });
-    const orders = await Order.find();
+    const orders = await Order.find({ businessId });
     for (const order of orders) {
       const checkSame = order.itemList.filter((item) => {
         return item.productId === productId;

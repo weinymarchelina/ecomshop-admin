@@ -18,7 +18,7 @@ const getUsers = async (req, res) => {
     // const users = await Order.find({
     //   businessId,
     // });
-    const users = await User.find();
+    const users = await User.find({ businessId });
 
     res.status(200).json({
       users,

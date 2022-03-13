@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import moment from "moment";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { ListAlt } from "@mui/icons-material";
 
 // const idLocale = require("moment/locale/id");
 // moment.locale("id", idLocale);
@@ -59,9 +60,10 @@ const DisplayReport = ({ user }) => {
   };
 
   const [isMain, setIsMain] = useState(true);
-  const [user, setUser] = useState({});
+  const [userList, setUserList] = useState({});
   const [report, setReport] = useState(null);
   const [total, setTotal] = useState({});
+  const [customer, setCustomer] = useState({});
   const [filter, setFilter] = useState("Today");
   const filterList = [
     `This Week (${showDate.thisWeekStart} - ${showDate.thisWeekEnd})`,
@@ -83,7 +85,7 @@ const DisplayReport = ({ user }) => {
   const fetchReport = async (start, end, filter) => {
     try {
       const res = await axios.post("/api/data/report", { start, end, filter });
-      const { report } = res.data;
+      const { report, userList } = res.data;
       const subtotal = report
         .map((item) => item.amount)
         .reduce((partialSum, a) => partialSum + a, 0);
@@ -95,8 +97,29 @@ const DisplayReport = ({ user }) => {
         subtotal,
         soldItem,
       });
+      console.log(userList);
+
+      const sortedBest = userList.sort((a, b) => b.totalOrder - a.totalOrder);
+
+      const best = sortedBest.filter(
+        (user) => user.totalOrder === sortedBest[0].totalOrder
+      );
+
+      const items = sortedBest.sort((a, b) => b.totalQty - a.totalQty);
+
+      console.log({
+        best,
+        most: userList[0],
+        items,
+      });
+      setCustomer({
+        best,
+        most: userList[0],
+        items: items[0],
+      });
 
       setReport(report);
+      setUserList(userList);
     } catch (err) {
       console.log(err.response?.data);
       throw new Error(err.message);
@@ -174,7 +197,6 @@ const DisplayReport = ({ user }) => {
             {report && (
               <Card variant="outlined" sx={{ mt: 3 }}>
                 <CardContent
-                  // className={`${matches ? "f-col" : "f-space"}`}
                   sx={{
                     display: "flex",
                     alignItems: "flex-end",
@@ -211,8 +233,15 @@ const DisplayReport = ({ user }) => {
                       </Select>
                     </FormControl>
                   </Box>
-                  <IconButton sx={{ pt: 0.65, mx: 2 }}>
-                    <AccountCircleIcon />
+                  <IconButton
+                    onClick={() => {
+                      setIsMain(!isMain);
+                      console.log(!isMain);
+                    }}
+                    sx={{ pt: 0.65, mx: 2 }}
+                  >
+                    {isMain && <AccountCircleIcon />}
+                    {!isMain && <ListAlt />}
                   </IconButton>
                 </CardContent>
               </Card>
@@ -236,9 +265,14 @@ const DisplayReport = ({ user }) => {
                       letterSpacing: "1px",
                     }}
                     variant={stacks ? "caption" : "body1"}
+                    component="p"
                     className="main-title"
                   >
-                    Total
+                    {isMain && "Total"}
+                    {!isMain &&
+                      `Most Order (${customer.best[0].totalOrder} ${
+                        customer.best[0].totalOrder <= 1 ? "order" : "orders"
+                      })`}
                   </Typography>
 
                   <Typography
@@ -246,7 +280,18 @@ const DisplayReport = ({ user }) => {
                     textAlign="right"
                     component="p"
                   >
-                    {formatter.format(total.subtotal)}
+                    {isMain && formatter.format(total.subtotal)}
+                    {!isMain &&
+                      customer.best.map((user) => {
+                        return (
+                          <Typography
+                            variant={stacks ? "caption" : "body1"}
+                            component="p"
+                          >
+                            {user.accName !== "" ? user.accName : user.name}
+                          </Typography>
+                        );
+                      })}
                   </Typography>
                 </Card>
                 <Card
@@ -267,7 +312,11 @@ const DisplayReport = ({ user }) => {
                     variant={stacks ? "caption" : "body1"}
                     className="main-title"
                   >
-                    Sold Items
+                    {isMain && "Sold Items"}
+                    {!isMain &&
+                      `Most Spending (${formatter.format(
+                        customer.most.totalPaid
+                      )})`}
                   </Typography>
 
                   <Typography
@@ -275,9 +324,16 @@ const DisplayReport = ({ user }) => {
                     textAlign="right"
                     component="p"
                   >
-                    {total.soldItem} pcs
+                    {isMain && `${total.soldItem} pcs`}
+                    {!isMain &&
+                      `${
+                        customer.most.accName !== ""
+                          ? customer.most.accName
+                          : customer.most.name
+                      }`}
                   </Typography>
                 </Card>
+
                 <Card
                   variant="outlined"
                   sx={{
@@ -296,7 +352,9 @@ const DisplayReport = ({ user }) => {
                     variant={stacks ? "caption" : "body1"}
                     className="main-title"
                   >
-                    Products
+                    {isMain && "Sold Products"}
+                    {!isMain &&
+                      "Most Items" + ` (${customer.items.totalQty} items)`}
                   </Typography>
 
                   <Typography
@@ -304,90 +362,185 @@ const DisplayReport = ({ user }) => {
                     textAlign="right"
                     component="p"
                   >
-                    {report.length} Products
+                    {isMain && (
+                      <>
+                        {report.length}
+                        {report.length <= 1 ? " Product" : " Products"}
+                      </>
+                    )}
+                    {!isMain &&
+                      `${
+                        customer.items.accName !== ""
+                          ? customer.items.accName
+                          : customer.items.name
+                      }`}
                   </Typography>
                 </Card>
               </>
             )}
             <Box>
-              {report.map((product) => {
-                return (
-                  <Box
-                    sx={{
-                      cursor: "pointer",
-                      "&:hover": {
-                        opacity: 0.85,
-                      },
-                    }}
-                    key={product._id}
-                    onClick={() => router.push(`/store/${product._id}`)}
-                  >
-                    <Card
-                      key={product._id}
-                      variant="outlined"
-                      sx={{
-                        backgroundColor: `${
-                          product.stockQty === 0 ? "#aaa" : "transparent"
-                        }`,
-                      }}
-                    >
-                      <CardContent className={switchNav ? "f-col" : "f-space"}>
-                        <Box className="f-row">
-                          <Box>
-                            <img
-                              src={product.image[0]}
-                              alt={`${product.name}-img`}
-                              style={{
-                                width: `${
-                                  stacks ? "3.75rem" : "calc(5rem + 1vw)"
-                                }`,
-                                height: `${
-                                  stacks ? "3.75rem" : "calc(5rem + 1vw)"
-                                }`,
-                                margin: "0 .5rem",
-                                opacity: `${product.stockQty === 0 ? 0.7 : 1}`,
-                              }}
-                            />
-                          </Box>
-                          <Box
-                            sx={{
-                              px: 1,
-                              flex: 1,
-                              width: `${matches ? "9rem" : "auto"}`,
-                            }}
-                          >
-                            <Typography
-                              variant="body1"
-                              component="h2"
-                              noWrap={matches ? true : false}
-                              sx={{ width: "100%" }}
-                            >
-                              {product.name}
-                            </Typography>
-                            <Box
-                              sx={{ display: "flex", alignItems: "flex-end" }}
-                            >
-                              <Typography component="p" fontWeight={"bold"}>
-                                {formatter.format(product.amount)}
-                              </Typography>
-                              <Typography
-                                sx={{
-                                  ml: 1,
-                                  mb: 0.25,
+              {isMain &&
+                report.map((product) => {
+                  return (
+                    <Box key={product._id}>
+                      <Card
+                        key={product._id}
+                        variant="outlined"
+                        sx={{
+                          backgroundColor: `${
+                            product.stockQty === 0 ? "#aaa" : "transparent"
+                          }`,
+                        }}
+                      >
+                        <CardContent
+                          className={switchNav ? "f-col" : "f-space"}
+                        >
+                          <Box className="f-row">
+                            <Box>
+                              <img
+                                src={product.image[0]}
+                                alt={`${product.name}-img`}
+                                style={{
+                                  width: `${
+                                    stacks ? "3.75rem" : "calc(5rem + 1vw)"
+                                  }`,
+                                  height: `${
+                                    stacks ? "3.75rem" : "calc(5rem + 1vw)"
+                                  }`,
+                                  margin: "0 .5rem",
+                                  opacity: `${
+                                    product.stockQty === 0 ? 0.7 : 1
+                                  }`,
                                 }}
-                                variant="caption"
-                                component="p"
+                              />
+                            </Box>
+                            <Box
+                              sx={{
+                                px: 1,
+                                flex: 1,
+                                width: `${matches ? "9rem" : "auto"}`,
+                              }}
+                            >
+                              <Typography
+                                variant="body1"
+                                component="h2"
+                                noWrap={matches ? true : false}
+                                sx={{ width: "100%" }}
                               >
-                                {product.buyedQty} pcs sold
+                                {product.name}
                               </Typography>
+                              <Box
+                                sx={{ display: "flex", alignItems: "flex-end" }}
+                              >
+                                <Typography component="p" fontWeight={"bold"}>
+                                  {formatter.format(product.amount)}
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    ml: 1,
+                                    mb: 0.25,
+                                  }}
+                                  variant="caption"
+                                  component="p"
+                                >
+                                  {product.buyedQty} pcs sold
+                                </Typography>
+                              </Box>
                             </Box>
                           </Box>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Box>
-                );
-              })}
+                        </CardContent>
+                      </Card>
+                    </Box>
+                  );
+                })}
+              {!isMain &&
+                userList.map((user) => {
+                  return (
+                    <Box key={user.userId}>
+                      <Card key={user.userId} variant="outlined">
+                        <CardContent
+                          className={switchNav ? "f-col" : "f-space"}
+                        >
+                          <Box className="f-row">
+                            <Box>
+                              <img
+                                src={user.picture}
+                                alt={`${user.name}-img`}
+                                style={{
+                                  width: `${
+                                    stacks ? "3.75rem" : "calc(5rem + 1vw)"
+                                  }`,
+                                  height: `${
+                                    stacks ? "3.75rem" : "calc(5rem + 1vw)"
+                                  }`,
+                                  margin: "0 .5rem",
+                                }}
+                              />
+                            </Box>
+                            <Box
+                              sx={{
+                                px: 1,
+                                flex: 1,
+                                width: `${matches ? "9rem" : "auto"}`,
+                              }}
+                            >
+                              <Typography
+                                variant="body1"
+                                component="h2"
+                                noWrap={matches ? true : false}
+                                sx={{ width: "100%" }}
+                                fontWeight={"bold"}
+                              >
+                                {user.accName ? user.accName : user.name}
+
+                                {user.accName ? ` (${user.name})` : ``}
+                              </Typography>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "flex-end",
+                                  }}
+                                >
+                                  <Typography component="p">
+                                    Spend {formatter.format(user.totalPaid)}
+                                  </Typography>
+                                  <Typography
+                                    sx={{
+                                      ml: 1,
+                                      mb: 0.25,
+                                    }}
+                                    variant="caption"
+                                    component="p"
+                                  >
+                                    {`(${user.totalQty} items)`}
+                                  </Typography>
+                                </Box>
+                                <Typography
+                                  sx={{
+                                    mb: 0.25,
+                                  }}
+                                  variant="caption"
+                                  component="p"
+                                >
+                                  {user.totalOrder} Successful{" "}
+                                  {user.totalOrder <= 1
+                                    ? " Transaction"
+                                    : " Transactions"}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    </Box>
+                  );
+                })}
             </Box>
           </Box>
         </Box>

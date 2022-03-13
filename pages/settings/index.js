@@ -296,7 +296,7 @@ const Settings = ({ user }) => {
     >
       <Typography
         className="main-title"
-        variant="h4"
+        variant={matches ? "h5" : "h4"}
         component="h1"
         sx={{ mb: 3 }}
         textAlign={matches ? "center" : "left"}

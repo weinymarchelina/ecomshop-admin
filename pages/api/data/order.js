@@ -19,7 +19,7 @@ const getOrder = async (req, res) => {
     // const orderData = await Order.find({
     //   businessId,
     // }).sort({ _id: -1 });
-    const orderData = await Order.find().sort({ _id: -1 });
+    const orderData = await Order.find({ businessId }).sort({ _id: -1 });
 
     const productData = await Product.find({
       businessId,
@@ -28,7 +28,7 @@ const getOrder = async (req, res) => {
     // const userData = await User.find({
     //   businessId,
     // });
-    const userData = await User.find();
+    const userData = await User.find({ businessId });
 
     res.status(200).json({
       orderData,

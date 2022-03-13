@@ -80,17 +80,17 @@ const Contact = () => {
       maxWidth={matches ? "sm" : "lg"}
     >
       {userList && (
-        <Card className="f-row" variant="outlined" size="small">
-          <CardContent className="f-col" sx={{ px: 5, width: "100%" }}>
+        <Box className="f-row" variant="outlined" size="small">
+          <Box className="f-col" sx={{ px: 5, width: "100%" }}>
             <Box
               className="f-space"
               sx={{
-                mt: 2,
+                my: 2,
                 flex: 1,
                 alignItems: "center",
               }}
             >
-              <Typography className="main-title" variant="h5" component="h2">
+              <Typography className="main-title" variant={matches ? "h5" : "h4"} component="h2">
                 Contact List
               </Typography>
             </Box>
@@ -98,7 +98,7 @@ const Contact = () => {
             <Box
               className="f-space"
               style={{
-                border: `${matches ? "none" : "1px solid #ddd"}`,
+                border: "1px solid #ddd",
                 borderRadius: ".5vw",
               }}
               sx={{
@@ -124,6 +124,7 @@ const Contact = () => {
                 fullWidth
                 autoComplete="off"
                 required
+                size={matches ? 'small' : 'medium'}
               />
               <Button
                 disabled={selectedUser?._id ? false : true}
@@ -150,7 +151,7 @@ const Contact = () => {
                   <Box
                     sx={{
                       flex: 19,
-                      py: 0.5,
+                      py: 1,
                     }}
                     className="f-col"
                   >
@@ -223,8 +224,8 @@ const Contact = () => {
                 Back
               </Button>
             </Box>
-          </CardContent>
-        </Card>
+          </Box>
+        </Box>
       )}
     </Container>
   );

@@ -277,8 +277,8 @@ const EditProduct = ({ user }) => {
       }}
       maxWidth={matches ? "sm" : "lg"}
     >
-      <Card className="f-row" variant="outlined" size="small" sx={{ p: 3 }}>
-        <CardContent
+      <Box className="f-row" variant="outlined" size="small" sx={{ p: 3 }}>
+        <Box
           className="f-col"
           sx={{
             px: "calc(1rem + 2.5vw)",
@@ -659,8 +659,8 @@ const EditProduct = ({ user }) => {
               Edit
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </Box>
+      </Box>
     </Container>
   );
 };

@@ -3,6 +3,7 @@ import User from "../../../models/user";
 import Product from "../../../models/product";
 import Order from "../../../models/order";
 import { getSession } from "next-auth/react";
+import axios from "axios";
 
 dbConnect();
 
@@ -25,16 +26,17 @@ const getUser = async (req, res) => {
     let orders = [];
     if (filter !== "All") {
       orders = await Order.find({
+        businessId,
         finishDate: {
           $gte: start,
           $lt: end,
         },
       });
     } else {
-      orders = await Order.find();
+      orders = await Order.find({ businessId });
     }
-    // const userList = [];
-    // let newArr = [];
+
+    const userList = [];
 
     const favItems = products.map((product) => {
       let buyedQty = 0;
@@ -48,24 +50,11 @@ const getUser = async (req, res) => {
           }
         }
 
-        // console.log(order.customerId);
-        // const result = userList.map((id) => {
-        //   if (order.customerId !== id) {
-        //     return id;
-        //   }
-        // });
-        // console.log(result);
-        // if (result) {
-        //   userList.push(order.customerId);
-        // }
-
-        // for (const userId of userList) {
-        //   console.log(order.customerId);
-        //   console.log(order.customerId !== userId);
-        //   if (order.customerId !== userId) {
-        //     userList.push(order.customerId);
-        //   }
-        // }
+        // console.log(userList);
+        // console.log(!userList.includes(order.customerId));
+        if (!userList.includes(order.customerId)) {
+          userList.push(order.customerId);
+        }
       }
 
       console.log(`${product.name}: ${buyedQty}`);
@@ -81,19 +70,41 @@ const getUser = async (req, res) => {
     });
 
     favItems.sort((a, b) => b.buyedQty - a.buyedQty);
-    // console.log(favItems);
+
     const topItems = favItems.filter((product) => product.buyedQty > 0);
 
-    // console.log(topItems);
+    const userInfo = userList.map(async (id) => {
+      const userOrders = orders.filter((order) => order.customerId === id);
+      const user = await User.find({
+        _id: id,
+      });
 
-    // console.log(userList);
-    // const user = await User.find({
-    //     // search absed on id from orders like loop
-    // });
+      const paid = userOrders
+        .map((userOrder) => userOrder.totalPrice)
+        .reduce((partialSum, a) => partialSum + a, 0);
+      const qty = userOrders
+        .map((userOrder) => userOrder.totalQty)
+        .reduce((partialSum, a) => partialSum + a, 0);
 
-    res.status(200).json({
-      //   user,
-      report: topItems,
+      return {
+        name: user[0].name,
+        picture: user[0].picture,
+        accName: user[0].contactInfo?.name,
+        userId: id,
+        totalOrder: userOrders.length,
+        totalPaid: paid,
+        totalQty: qty,
+      };
+    });
+
+    axios.all(userInfo).then(async (userArr) => {
+      userArr.sort((a, b) => b.totalPaid - a.totalPaid);
+      console.log(userArr);
+
+      return res.status(200).json({
+        userList: userArr,
+        report: topItems,
+      });
     });
   } catch (err) {
     console.log(err.message);

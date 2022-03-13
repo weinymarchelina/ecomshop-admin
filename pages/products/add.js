@@ -30,6 +30,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import ErrorWarning from "../../components/ErrorWarning";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import LoadingModal from "../../components/LoadingModal";
+import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 
 const AddProduct = ({ user }) => {
   const stacks = useMediaQuery("(max-width:450px)");
@@ -184,7 +185,20 @@ const AddProduct = ({ user }) => {
     }
   };
 
-  const handleChange = (event) => {
+  const handleChange = (event, newArr = null) => {
+    if (event === "Order") {
+      const newPath = [];
+      for (const obj of newArr) {
+        const reader = new FileReader();
+
+        newPath.push(obj);
+
+        reader.readAsDataURL(obj.file);
+      }
+      console.log(newPath);
+      setImgPath(newPath);
+      return;
+    }
     console.log(event.target.files);
 
     const counter = imgPath.length;
@@ -217,6 +231,28 @@ const AddProduct = ({ user }) => {
     setImgError(null);
   };
 
+  const moveImg = (old_index, new_index) => {
+    console.log(old_index, new_index);
+    if (new_index === imgPath.length) {
+      new_index = 0;
+    }
+    console.log(old_index, new_index);
+    while (old_index < 0) {
+      old_index += imgPath.length;
+    }
+    while (new_index < 0) {
+      new_index += imgPath.length;
+    }
+    if (new_index >= imgPath.length) {
+      var k = new_index - imgPath.length + 1;
+      while (k--) {
+        imgPath.push(undefined);
+      }
+    }
+    imgPath.splice(new_index, 0, imgPath.splice(old_index, 1)[0]);
+    handleChange("Order", imgPath);
+  };
+
   return (
     <Container
       sx={{
@@ -224,8 +260,8 @@ const AddProduct = ({ user }) => {
       }}
       maxWidth={matches ? "sm" : "lg"}
     >
-      <Card className="f-row" variant="outlined" size="small" sx={{ p: 3 }}>
-        <CardContent
+      <Box className="f-row" variant="outlined" size="small" sx={{ p: 3 }}>
+        <Box
           className="f-col"
           sx={{
             px: "calc(1rem + 2.5vw)",
@@ -241,7 +277,11 @@ const AddProduct = ({ user }) => {
               alignItems: "center",
             }}
           >
-            <Typography className="main-title" variant="h5" component="h2">
+            <Typography
+              className="main-title"
+              variant={matches ? "h5" : "h4"}
+              component="h2"
+            >
               Add Product
             </Typography>
           </Box>
@@ -396,12 +436,39 @@ const AddProduct = ({ user }) => {
                         {index + 1}/{imgPath.length}
                       </Box>
                       <IconButton
+                        onClick={() => moveImg(index, index - 1)}
+                        sx={{
+                          position: "absolute",
+                          left: 0,
+                          bottom: 0,
+                          mb: 1,
+                          ml: 1.5,
+                          p: 0.35,
+                          backgroundColor: "#eeeeee80",
+                        }}
+                      >
+                        <ChevronLeft color="primary" />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => moveImg(index, index + 1)}
+                        sx={{
+                          position: "absolute",
+                          right: 0,
+                          bottom: 0,
+                          mb: 1,
+                          mr: 0.5,
+                          p: 0.35,
+                          backgroundColor: "#eeeeee80",
+                        }}
+                      >
+                        <ChevronRight color="primary" />
+                      </IconButton>
+                      <IconButton
                         onClick={() => handleDelete(pathItem)}
                         sx={{
                           position: "absolute",
                           right: 0,
                           mt: 0.25,
-                          letterSpacing: "1.5px",
                         }}
                       >
                         <DeleteIcon color="primary" />
@@ -605,8 +672,8 @@ const AddProduct = ({ user }) => {
               Add
             </Button>
           </form>
-        </CardContent>
-      </Card>
+        </Box>
+      </Box>
     </Container>
   );
 };
