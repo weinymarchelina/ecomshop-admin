@@ -16,19 +16,25 @@ const getUser = async (req, res) => {
     if (!session) return res.status(400).json({ msg: "Please login first." });
 
     const { businessId } = session.user;
-    const { start, end } = req.body;
+    const { start, end, filter } = req.body;
     console.log(start);
     console.log(end);
 
     const products = await Product.find({ businessId });
-    const orders = await Order.find({
-      finishDate: {
-        $gte: "Fri Feb 25 2022 15:31:58 GMT+0800 (Central Indonesia Time)",
-        $lt: "Thu Mar 31 2022 15:31:58 GMT+0800 (Central Indonesia Time)",
-      },
-    });
-    const userList = [];
-    let newArr = [];
+
+    let orders = [];
+    if (filter !== "All") {
+      orders = await Order.find({
+        finishDate: {
+          $gte: start,
+          $lt: end,
+        },
+      });
+    } else {
+      orders = await Order.find();
+    }
+    // const userList = [];
+    // let newArr = [];
 
     const favItems = products.map((product) => {
       let buyedQty = 0;
@@ -80,7 +86,7 @@ const getUser = async (req, res) => {
 
     // console.log(topItems);
 
-    console.log(userList);
+    // console.log(userList);
     // const user = await User.find({
     //     // search absed on id from orders like loop
     // });

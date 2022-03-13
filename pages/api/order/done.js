@@ -21,7 +21,7 @@ const finishOrder = async (req, res) => {
 
     let finishDate;
     if (done) {
-      finishDate = new Date();
+      finishDate = new Date().toISOString();
     } else {
       finishDate = "-";
     }

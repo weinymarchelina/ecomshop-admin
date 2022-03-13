@@ -19,6 +19,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import moment from "moment";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 // const idLocale = require("moment/locale/id");
 // moment.locale("id", idLocale);
@@ -26,24 +27,23 @@ import moment from "moment";
 const DisplayReport = ({ user }) => {
   const router = useRouter();
 
-  const startHours = new Date().setHours(0, 0, 0, 0);
-  const endHours = new Date().setHours(23, 59, 59, 999);
-  const today = moment(new Date()).format();
-  const thisWeekStart = moment(new Date()).startOf("week").format();
-  const thisWeekEnd = moment(new Date()).endOf("week").format();
-  const thisMonthStart = moment(new Date()).startOf("month").format();
-  const thisMonthEnd = moment(new Date()).endOf("month").format();
+  const startHours = moment(new Date()).startOf("day").toISOString();
+  const endHours = moment(new Date()).endOf("day").toISOString();
+  const thisWeekStart = moment(new Date()).startOf("week").toISOString();
+  const thisWeekEnd = moment(new Date()).endOf("week").toISOString();
+  const thisMonthStart = moment(new Date()).startOf("month").toISOString();
+  const thisMonthEnd = moment(new Date()).endOf("month").toISOString();
   const prevMonthStart = moment(new Date())
     .subtract(1, "months")
     .startOf("month")
-    .format();
+    .toISOString();
   const prevMonthEnd = moment(new Date())
     .subtract(1, "months")
     .endOf("month")
-    .format();
+    .toISOString();
 
   const showDate = {
-    today: moment(new Date()).format("lll"),
+    today: moment(new Date()).format("MMM Do"),
     thisWeekStart: moment(new Date()).startOf("week").format("MMM Do"),
     thisWeekEnd: moment(new Date()).endOf("week").format("MMM Do"),
     thisMonthStart: moment(new Date()).startOf("month").format("MMM Do"),
@@ -58,10 +58,10 @@ const DisplayReport = ({ user }) => {
       .format("MMM Do"),
   };
 
+  const [isMain, setIsMain] = useState(true);
+  const [user, setUser] = useState({});
   const [report, setReport] = useState(null);
-  const [total, setTotal] = useState(0);
-  const [start, setStart] = useState(moment(startHours).format());
-  const [end, setEnd] = useState(moment(endHours).format());
+  const [total, setTotal] = useState({});
   const [filter, setFilter] = useState("Today");
   const filterList = [
     `This Week (${showDate.thisWeekStart} - ${showDate.thisWeekEnd})`,
@@ -80,15 +80,9 @@ const DisplayReport = ({ user }) => {
     minimumFractionDigits: 0,
   });
 
-  useEffect(async () => {
-    console.log(startHours);
+  const fetchReport = async (start, end, filter) => {
     try {
-      const res = await axios.post("/api/data/report", {
-        start: thisWeekStart,
-        end: thisWeekEnd,
-      });
-      // const res = await axios.post("/api/data/report", { start, end });
-      console.log(res.data);
+      const res = await axios.post("/api/data/report", { start, end, filter });
       const { report } = res.data;
       const subtotal = report
         .map((item) => item.amount)
@@ -102,77 +96,52 @@ const DisplayReport = ({ user }) => {
         soldItem,
       });
 
-      console.log(report);
       setReport(report);
     } catch (err) {
       console.log(err.response?.data);
       throw new Error(err.message);
     }
+  };
+
+  useEffect(async () => {
+    fetchReport(startHours, endHours, filter);
   }, []);
 
-  // const filterOrders = () => {
-  //   let filteredOrders;
-  //   console.log("filtered");
-  //   console.log(filter);
+  const filterReport = (filter) => {
+    console.log(filter);
 
-  //   switch (filter) {
-  //     case `This Week (${showDate.thisWeekStart} - ${showDate.thisWeekEnd})`:
-  //       filteredOrders = searchedOrder.filter((order) => {
-  //         const orderDate = moment(new Date(order.createdAt)).format("lll");
+    switch (filter) {
+      case `This Week (${showDate.thisWeekStart} - ${showDate.thisWeekEnd})`:
+        // setStart(thisWeekStart);
+        // setEnd(thisWeekEnd);
+        fetchReport(thisWeekStart, thisWeekEnd, filter);
 
-  //         return moment(new Date(orderDate)).isBetween(
-  //           startDayOfPrevWeek,
-  //           lastDayOfPrevWeek
-  //         );
-  //       });
+        break;
 
-  //       break;
+      case `This Month (${showDate.thisMonthStart} - ${showDate.thisMonthEnd})`:
+        // setStart(thisMonthStart);
+        // setEnd(thisMonthEnd);
+        fetchReport(thisMonthStart, thisMonthEnd, filter);
 
-  //     case `This Month (${showDate.thisMonthStart} - ${showDate.thisMonthEnd})`:
-  //       filteredOrders = searchedOrder.filter((order) => {
-  //         const orderDate = moment(new Date(order.createdAt)).format("lll");
+        break;
 
-  //         return moment(new Date(orderDate)).isBetween(
-  //           startDayOfMonth,
-  //           lastDayOfMonth
-  //         );
-  //       });
+      case `Last Month (${showDate.prevMonthStart} - ${showDate.prevMonthEnd})`:
+        // setStart(prevMonthStart);
+        // setEnd(prevMonthEnd);
+        fetchReport(prevMonthStart, prevMonthEnd, filter);
 
-  //       break;
+        break;
 
-  //     case `Last Month (${showDate.prevMonthStart} - ${showDate.prevMonthEnd})`:
-  //       filteredOrders = searchedOrder.filter(
-  //         (order) => order.doneStatus && order.finishDate === "-"
-  //       );
-  //       console.log(filteredOrders);
-  //       break;
+      case "All":
+        fetchReport("", "", filter);
 
-  //     case "All":
-  //       // ALL
-  //       // filteredOrders = searchedOrder.filter((order) => {
-  //       //   const orderDate = moment(new Date(order.createdAt)).format("lll");
+        break;
 
-  //       //   return moment(new Date(orderDate)).isBetween(
-  //       //     startDayOfPrevWeek,
-  //       //     lastDayOfPrevWeek
-  //       //   );
-  //       // });
-
-  //       break;
-
-  //     default:
-  //       filteredOrders = searchedOrder.filter(
-  //         (order) =>
-  //           moment(new Date(order.createdAt)).format("LL") ===
-  //           moment(new Date()).format("LL")
-  //       );
-
-  //       break;
-  //   }
-
-  //   return filteredOrders;
-  // };
-  // const newOrders = filterOrders();
+      default:
+        fetchReport(startHours, endHours, filter);
+        break;
+    }
+  };
 
   return (
     <Container
@@ -205,26 +174,31 @@ const DisplayReport = ({ user }) => {
             {report && (
               <Card variant="outlined" sx={{ mt: 3 }}>
                 <CardContent
-                  className={`${matches ? "f-col" : "f-space"}`}
-                  sx={{ alignItems: "center", py: 3, gap: 3 }}
+                  // className={`${matches ? "f-col" : "f-space"}`}
+                  sx={{
+                    display: "flex",
+                    alignItems: "flex-end",
+                    py: 3,
+                    gap: 3,
+                  }}
                 >
                   <Box
                     className="f-space"
                     sx={{ flex: 2, gap: 3, width: "100%" }}
                   >
-                    {/* <IconButton>
-                      <AccountBoxIcon />
-                    </IconButton> */}
                     <FormControl variant="standard" sx={{ flex: 1 }}>
                       <InputLabel>Filter</InputLabel>
                       <Select
                         value={filter}
                         label="Category"
-                        onChange={(e) => setFilter(e.target.value)}
+                        onChange={(e) => {
+                          setFilter(e.target.value);
+                          filterReport(e.target.value);
+                        }}
                       >
                         <MenuItem value="Today">
                           <Typography variant="subtitle1" component="p">
-                            Today
+                            {`Today (${showDate.today})`}
                           </Typography>
                         </MenuItem>
                         {filterList.map((filter) => (
@@ -237,7 +211,9 @@ const DisplayReport = ({ user }) => {
                       </Select>
                     </FormControl>
                   </Box>
-                  <Box sx={{ flex: 2, pt: 0.65 }}></Box>
+                  <IconButton sx={{ pt: 0.65, mx: 2 }}>
+                    <AccountCircleIcon />
+                  </IconButton>
                 </CardContent>
               </Card>
             )}
@@ -413,120 +389,6 @@ const DisplayReport = ({ user }) => {
                 );
               })}
             </Box>
-            {/* {order && (
-              <>
-                <Card
-                  variant="outlined"
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    px: 2,
-                    py: 1,
-                  }}
-                >
-                  <Typography variant={stacks ? "caption" : "body1"}>
-                    Order Date
-                  </Typography>
-                  <Typography
-                    variant={stacks ? "caption" : "body1"}
-                    textAlign="right"
-                  >
-                    {moment(new Date(order.createdAt)).format("LLL")}
-                  </Typography>
-                </Card>
-
-                {order.doneStatus && order.doneStatus !== "-" && (
-                  <Card
-                    variant="outlined"
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      px: 2,
-                      py: 1,
-                    }}
-                  >
-                    <Typography variant={stacks ? "caption" : "body1"}>
-                      Finish Date
-                    </Typography>
-                    <Typography
-                      variant={stacks ? "caption" : "body1"}
-                      textAlign="right"
-                    >
-                      {moment(new Date(order.finishDate)).format("LLL")}
-                    </Typography>
-                  </Card>
-                )}
-
-                <Card
-                  variant="outlined"
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    px: 2,
-                    py: 1,
-                  }}
-                >
-                  <Typography variant={stacks ? "caption" : "body1"}>
-                    Note
-                  </Typography>
-                  <Typography
-                    variant={stacks ? "caption" : "body1"}
-                    textAlign="right"
-                  >
-                    {order.note ? order.note : "-"}
-                  </Typography>
-                </Card>
-
-                <Card
-                  variant="outlined"
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    px: 2,
-                    py: 1,
-                  }}
-                >
-                  <Typography
-                    style={{
-                      marginRight: `${matches ? "0" : "2rem"}`,
-                    }}
-                    variant={stacks ? "caption" : "body1"}
-                  >
-                    Payment Method
-                  </Typography>
-                  <Typography
-                    variant={stacks ? "caption" : "body1"}
-                    textAlign="right"
-                  >
-                    {order.paymentMethod}
-                  </Typography>
-                </Card>
-                <Card
-                  variant="outlined"
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    px: 2,
-                    py: 1,
-                  }}
-                >
-                  <Typography variant={stacks ? "caption" : "body1"}>
-                    Total Order {`(${order.totalQty} Items)`}
-                  </Typography>
-                  <Typography
-                    sx={{ textAlign: "right" }}
-                    variant={stacks ? "caption" : "body1"}
-                  >
-                    {formatter.format(order.totalPrice)}
-                  </Typography>
-                </Card>
-              </>
-            )} */}
           </Box>
         </Box>
       )}
