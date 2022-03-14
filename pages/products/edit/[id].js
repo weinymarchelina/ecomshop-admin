@@ -72,9 +72,7 @@ const EditProduct = ({ user }) => {
         productId: id,
       });
       const { isUsed } = res2.data;
-      console.log(isUsed);
 
-      console.log(productData);
       setProduct(productData);
       setActive(productData.activeStatus);
       setDesc(productData.desc);
@@ -100,6 +98,7 @@ const EditProduct = ({ user }) => {
       setImgPath(oldImgPaths);
       setOldImgPath(productData.image);
     } catch (err) {
+      console.log(err.message);
       console.log(err.response.data.msg);
       console.log(err.response?.data);
       throw new Error(err.message);
@@ -118,7 +117,6 @@ const EditProduct = ({ user }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     e.target.disabled = true;
-    console.log(e.target.disabled);
 
     if (imgPath.length === 0) {
       setImgError("Please upload an image");
@@ -134,8 +132,6 @@ const EditProduct = ({ user }) => {
 
     setLoading(true);
 
-    console.log(imgPath);
-
     const imgLinks = imgPath.map(async (imgObj) => {
       if (!imgObj.file) {
         return imgObj.path;
@@ -149,8 +145,6 @@ const EditProduct = ({ user }) => {
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_API_CLOUD_NAME}/image/upload`,
         formData
       );
-
-      console.log("Howdy 3");
 
       return await res.data.secure_url;
     });
@@ -176,11 +170,8 @@ const EditProduct = ({ user }) => {
         deletedLinks,
       };
 
-      console.log(product);
-
       try {
         const res = await axios.post("/api/products/edit", product);
-        console.log(res);
         setActive(true);
         setCategory("");
         setDesc("");
@@ -195,6 +186,7 @@ const EditProduct = ({ user }) => {
 
         router.push("/products");
       } catch (err) {
+        console.log(err.message);
         console.log(err.response?.data);
         throw new Error(err.message);
       }
@@ -205,8 +197,6 @@ const EditProduct = ({ user }) => {
     const sameQty = priceList.filter((tag) => {
       return tag.minOrder === Number(minOrder);
     });
-
-    console.log(sameQty);
 
     if (sameQty.length > 0) {
       setError("Please input different order quantity");
@@ -238,12 +228,9 @@ const EditProduct = ({ user }) => {
   };
 
   const handleChange = (event) => {
-    console.log(event.target.files);
-
     const counter = imgPath.length;
 
     for (const file of event.target.files) {
-      console.log(file);
       counter++;
       if (counter > 6) {
         setImgError("You can only upload maximum 6 images");

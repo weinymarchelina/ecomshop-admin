@@ -29,7 +29,6 @@ const editCategory = async (req, res) => {
         category: setList,
       }
     );
-    console.log(response);
 
     res.status(200).json({
       msg: `Category list has been successfully updated`,

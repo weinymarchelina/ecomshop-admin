@@ -39,12 +39,13 @@ const editProduct = async (req, res) => {
           console.log(result, error);
         })
         .then((resp) => console.log(resp))
-        .catch((_err) =>
-          console.log("Something went wrong, please try again later.")
-        );
+        .catch((_err) => {
+          console.log(_err);
+          console.log("Something went wrong, please try again later.");
+        });
     }
 
-    const response = await Product.updateOne(
+    await Product.updateOne(
       { _id: id },
       {
         name,
@@ -57,7 +58,6 @@ const editProduct = async (req, res) => {
         price,
       }
     );
-    console.log(response);
 
     res.status(200).json({
       msg: `Product information has been successfully changed`,

@@ -4,14 +4,7 @@ import {
   CardContent,
   Container,
   Typography,
-  IconButton,
-  TextField,
   Button,
-  Checkbox,
-  FormControl,
-  Input,
-  Select,
-  MenuItem,
   Modal,
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -68,16 +61,12 @@ const DisplayOrder = ({ user }) => {
         productObj.orderedQty = item.quantity;
         productObj.orderedPrice = item.price;
 
-        console.log(orderData);
-        console.log(productObj);
         return productObj;
       });
-      console.log(orderedProductList);
       setProducts(orderedProductList);
-
-      console.log(orderData);
       setOrder(orderData);
     } catch (err) {
+      console.log(err.message);
       console.log(err.response?.data);
       throw new Error(err.message);
     }
@@ -115,7 +104,6 @@ const DisplayOrder = ({ user }) => {
   };
 
   const handleCancel = async (order) => {
-    console.log("Cancel!");
     try {
       const res = await axios.post("/api/order/done", {
         order,
@@ -123,7 +111,6 @@ const DisplayOrder = ({ user }) => {
       });
       const { msg } = res.data;
       router.push("/order");
-      console.log(msg);
     } catch (err) {
       console.log(err.message);
       console.log(err.response.data);
@@ -132,14 +119,12 @@ const DisplayOrder = ({ user }) => {
   };
 
   const handleFinish = async (order) => {
-    console.log("Finish");
     try {
       const res = await axios.post("/api/order/done", {
         order,
         done: true,
       });
       const { msg } = res.data;
-      console.log(msg);
       router.push("/order");
     } catch (err) {
       console.log(err.message);
@@ -170,7 +155,6 @@ const DisplayOrder = ({ user }) => {
                 className="main-title"
                 variant={matches ? "h5" : "h4"}
                 component="h2"
-                // sx={{ mb: 2 }}
               >
                 Order Details
               </Typography>
@@ -205,7 +189,6 @@ const DisplayOrder = ({ user }) => {
                     px: 1,
                     py: 0.5,
                     borderRadius: "0.35vw",
-                    // backgroundColor: getColor(order),
                   }}
                   style={getStyle(order)}
                 >
@@ -319,7 +302,6 @@ const DisplayOrder = ({ user }) => {
                         sx={{ mr: 1 }}
                         onClick={(e) => {
                           e.target.disabled = true;
-                          console.log(e.target.disabled);
                           action.func(action.order);
                         }}
                       >
@@ -489,7 +471,6 @@ const DisplayOrder = ({ user }) => {
                             func: handleCancel,
                             order,
                           });
-                          // handleCancel(order);
                         }}
                         variant="outlined"
                       >

@@ -35,11 +35,10 @@ const BusinessCategory = ({ user }) => {
       }
 
       setCategoryList(businessCategory);
-      console.log(businessCategory);
       setProducts(productData);
-      console.log(productData);
     } catch (err) {
       console.log(err.message);
+      console.log(err.response?.data);
       throw new Error(err.message);
     }
   }, []);
@@ -93,7 +92,6 @@ const BusinessCategory = ({ user }) => {
         });
       const res = await axios.post("/api/products/category", nameArr);
 
-      console.log(res);
       router.push("/products");
     } catch (err) {
       console.log(err.message);
@@ -203,7 +201,6 @@ const BusinessCategory = ({ user }) => {
                 variant="contained"
                 onClick={(e) => {
                   e.target.disabled = true;
-                  console.log(e.target.disabled);
                   handleSave();
                 }}
               >

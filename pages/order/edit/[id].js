@@ -7,11 +7,6 @@ import {
   IconButton,
   TextField,
   Button,
-  Checkbox,
-  FormControl,
-  Input,
-  Select,
-  MenuItem,
 } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { getSession } from "next-auth/react";
@@ -60,8 +55,6 @@ const EditOrder = ({ user }) => {
         productObj.orderedQty = item.quantity;
         productObj.orderedPrice = item.price;
 
-        // console.log(orderData);
-        console.log(productObj);
         return productObj;
       });
       setProducts(orderedProductList);
@@ -69,6 +62,7 @@ const EditOrder = ({ user }) => {
       setSubtotal(formatter.format(orderData.totalPrice));
       setTotalOrder(orderData.totalQty);
     } catch (err) {
+      console.log(err.message);
       console.log(err.response?.data);
       throw new Error(err.message);
     }
@@ -147,10 +141,8 @@ const EditOrder = ({ user }) => {
 
   const getSelectedQty = (arr = products) => {
     const totalQty = arr.map((item) => {
-      console.log(item.orderedQty ? item.orderedQty : 0);
       return item.orderedQty ? item.orderedQty : 0;
     });
-    console.log(totalQty);
     const result = totalQty.reduce((partialSum, a) => partialSum + a, 0);
     setTotalOrder(result);
   };
@@ -173,19 +165,10 @@ const EditOrder = ({ user }) => {
       const currentStock =
         productData.stockQty + theOrderedQty.quantity - productData.orderedQty;
 
-      console.log(`
-        Product name: ${productData.name}
-        Original Stock: ${productData.stockQty + theOrderedQty.quantity}
-        Purchased: ${productData.orderedQty}
-        Current Stock: ${currentStock}
-        `);
-
       productData.stockQty = currentStock;
 
-      console.log(productData);
       return productData;
     });
-    console.log(newProducts);
 
     try {
       const res = await axios.post("/api/order/edit", {
@@ -193,11 +176,9 @@ const EditOrder = ({ user }) => {
         totalQty: totalOrder,
         itemList: newItemList,
         order,
-        // orderOriItem: order.itemList,
         products: newProducts,
       });
 
-      console.log(res.data);
       router.push("/order");
     } catch (err) {
       console.log(err.message);
@@ -263,7 +244,6 @@ const EditOrder = ({ user }) => {
                     px: 1,
                     py: 0.5,
                     borderRadius: "0.35vw",
-                    // backgroundColor: getColor(order),
                   }}
                   style={getStyle(order)}
                 >
@@ -456,10 +436,6 @@ const EditOrder = ({ user }) => {
                                     (item) => item.productId === product._id
                                   );
 
-                                  // const max =
-                                  //   product.stockQty < theOrderedQty.quantity
-                                  //     ? theOrderedQty.quantity
-                                  //     : product.stockQty;
                                   const max =
                                     product.stockQty + theOrderedQty.quantity;
 
@@ -586,7 +562,6 @@ const EditOrder = ({ user }) => {
                       variant="contained"
                       onClick={(e) => {
                         e.target.disabled = true;
-                        console.log(e.target.disabled);
                         handleSave();
                       }}
                     >

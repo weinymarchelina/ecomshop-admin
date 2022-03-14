@@ -19,7 +19,6 @@ const addOrder = async (req, res) => {
     const role = session.user.role;
     const { totalPrice, totalQty, itemList, order, products } = req.body;
 
-    console.log(role);
     await Order.updateOne(
       { _id: order._id },
       {
@@ -30,28 +29,22 @@ const addOrder = async (req, res) => {
     );
 
     const updateProducts = products.map(async (product) => {
-      console.log(product.name + ": " + product.stockQty);
-      const result = await Product.updateOne(
+      await Product.updateOne(
         { _id: product._id },
         {
           stockQty: product.stockQty,
         }
       );
-      console.log(result);
     });
 
     const newOrder = await axios
       .all(updateProducts)
       .then(async (updateProducts) => {
-        console.log(updateProducts);
-
         const orderData = await Order.findById(order._id);
         return orderData;
       });
 
     if (role === "Owner" && order.doneStatus && order.finishDate !== "-") {
-      console.log("after order edit");
-
       for (const item of itemList) {
         const originalObj = order.itemList.filter(
           (oriItem) => oriItem.productId === item.productId
@@ -61,12 +54,9 @@ const addOrder = async (req, res) => {
         const product = products.filter(
           (product) => product._id === item.productId
         )[0];
-        console.log(product);
 
         const gap = item.quantity - originalQty;
-        console.log(gap);
 
-        console.log("Finish order");
         await Product.updateOne(
           { _id: item.productId },
           {
@@ -74,8 +64,6 @@ const addOrder = async (req, res) => {
           }
         );
       }
-    } else {
-      console.log("before order edit");
     }
 
     if (role === "Owner" && order.doneStatus && order.finishDate !== "-") {
@@ -88,8 +76,7 @@ const addOrder = async (req, res) => {
 
       const qtyGap = totalQty - order.totalQty;
       const priceGap = totalPrice - order.totalPrice;
-      console.log(order.totalQty);
-      console.log(qtyGap);
+
       await User.updateOne(
         { _id: order.customerId },
         {

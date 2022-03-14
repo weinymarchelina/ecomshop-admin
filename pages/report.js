@@ -26,8 +26,6 @@ import { ListAlt } from "@mui/icons-material";
 // moment.locale("id", idLocale);
 
 const DisplayReport = ({ user }) => {
-  const router = useRouter();
-
   const startHours = moment(new Date()).startOf("day").toISOString();
   const endHours = moment(new Date()).endOf("day").toISOString();
   const thisWeekStart = moment(new Date()).startOf("week").toISOString();
@@ -97,7 +95,6 @@ const DisplayReport = ({ user }) => {
         subtotal,
         soldItem,
       });
-      console.log(userList);
 
       const sortedBest = userList.sort((a, b) => b.totalOrder - a.totalOrder);
 
@@ -107,11 +104,6 @@ const DisplayReport = ({ user }) => {
 
       const items = sortedBest.sort((a, b) => b.totalQty - a.totalQty);
 
-      console.log({
-        best,
-        most: userList[0],
-        items,
-      });
       setCustomer({
         best,
         most: userList[0],
@@ -121,6 +113,7 @@ const DisplayReport = ({ user }) => {
       setReport(report);
       setUserList(userList);
     } catch (err) {
+      console.log(err.message);
       console.log(err.response?.data);
       throw new Error(err.message);
     }
@@ -131,26 +124,18 @@ const DisplayReport = ({ user }) => {
   }, []);
 
   const filterReport = (filter) => {
-    console.log(filter);
-
     switch (filter) {
       case `This Week (${showDate.thisWeekStart} - ${showDate.thisWeekEnd})`:
-        // setStart(thisWeekStart);
-        // setEnd(thisWeekEnd);
         fetchReport(thisWeekStart, thisWeekEnd, filter);
 
         break;
 
       case `This Month (${showDate.thisMonthStart} - ${showDate.thisMonthEnd})`:
-        // setStart(thisMonthStart);
-        // setEnd(thisMonthEnd);
         fetchReport(thisMonthStart, thisMonthEnd, filter);
 
         break;
 
       case `Last Month (${showDate.prevMonthStart} - ${showDate.prevMonthEnd})`:
-        // setStart(prevMonthStart);
-        // setEnd(prevMonthEnd);
         fetchReport(prevMonthStart, prevMonthEnd, filter);
 
         break;
@@ -236,7 +221,6 @@ const DisplayReport = ({ user }) => {
                   <IconButton
                     onClick={() => {
                       setIsMain(!isMain);
-                      console.log(!isMain);
                     }}
                     sx={{ pt: 0.65, mx: 2 }}
                   >

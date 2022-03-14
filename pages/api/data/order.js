@@ -16,18 +16,12 @@ const getOrder = async (req, res) => {
     if (!session) return res.status(400).json({ msg: "Please login first." });
     const { businessId } = session.user;
 
-    // const orderData = await Order.find({
-    //   businessId,
-    // }).sort({ _id: -1 });
     const orderData = await Order.find({ businessId }).sort({ _id: -1 });
 
     const productData = await Product.find({
       businessId,
     });
 
-    // const userData = await User.find({
-    //   businessId,
-    // });
     const userData = await User.find({ businessId });
 
     res.status(200).json({

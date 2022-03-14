@@ -18,8 +18,6 @@ const getUser = async (req, res) => {
 
     const { businessId } = session.user;
     const { start, end, filter } = req.body;
-    console.log(start);
-    console.log(end);
 
     const products = await Product.find({ businessId });
 
@@ -50,15 +48,10 @@ const getUser = async (req, res) => {
           }
         }
 
-        // console.log(userList);
-        // console.log(!userList.includes(order.customerId));
         if (!userList.includes(order.customerId)) {
           userList.push(order.customerId);
         }
       }
-
-      console.log(`${product.name}: ${buyedQty}`);
-      console.log(`${product.name}: ${amount}`);
 
       return {
         productId: product._id,
@@ -99,7 +92,6 @@ const getUser = async (req, res) => {
 
     axios.all(userInfo).then(async (userArr) => {
       userArr.sort((a, b) => b.totalPaid - a.totalPaid);
-      console.log(userArr);
 
       return res.status(200).json({
         userList: userArr,

@@ -80,6 +80,7 @@ const Settings = ({ user }) => {
       setPromoted(promoted);
     } catch (err) {
       console.log(err.message);
+      console.log(err.response?.data);
       throw new Error(err.message);
     }
   }, []);
@@ -106,7 +107,6 @@ const Settings = ({ user }) => {
   const handlePassword = async (e) => {
     e.preventDefault();
     e.target.disabled = true;
-    console.log(e.target.disabled);
 
     if (newPassword !== confirmPassword) {
       setPasswordError(`New password and confirm new password don't match`);
@@ -133,7 +133,6 @@ const Settings = ({ user }) => {
   const handleEdit = async (e) => {
     e.preventDefault();
     e.target.disabled = true;
-    console.log(e.target.disabled);
 
     if (!name && !phone & !email) {
       setError(`Please input at least one of the fields`);
@@ -166,8 +165,9 @@ const Settings = ({ user }) => {
       setSuccessMsg(res.data.msg);
     } catch (err) {
       setError(err.response?.data.msg);
-
-      return;
+      console.log(err.message);
+      console.log(err.response?.data);
+      throw new Error(err.message);
     }
   };
 
@@ -181,6 +181,8 @@ const Settings = ({ user }) => {
       });
       window.location.reload();
     } catch (err) {
+      console.log(err.message);
+      console.log(err.response?.data);
       setError(err.response.data.msg);
       return;
     }
@@ -196,6 +198,8 @@ const Settings = ({ user }) => {
       });
       signOut({ callbackUrl: `${window.location.origin}/` });
     } catch (err) {
+      console.log(err.message);
+      console.log(err.response?.data);
       setError(err.response.data.msg);
       return;
     }
@@ -209,6 +213,8 @@ const Settings = ({ user }) => {
       });
       signOut({ callbackUrl: `${window.location.origin}/` });
     } catch (err) {
+      console.log(err.message);
+      console.log(err.response?.data);
       setError(err.response.data.msg);
       return;
     }

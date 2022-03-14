@@ -14,8 +14,6 @@ const updateContact = async (req, res) => {
     if (!session) return res.status(400).json({ msg: "Please login first." });
 
     const userList = req.body;
-    console.log("user list");
-    console.log(userList);
 
     for (const user of userList) {
       await User.updateOne(

@@ -34,7 +34,6 @@ const Employee = ({ user }) => {
           role: "Employee",
         };
 
-        // console.log(data);
         setCookies("status", data);
         setEmail("");
         setPassword("");
@@ -47,8 +46,9 @@ const Employee = ({ user }) => {
         throw new Error("Email or password is incorrect");
       }
     } catch (err) {
-      console.log(err);
-      // throw new Error(err.response.data.msg);
+      console.log(err.message);
+      console.log(err.response?.data);
+      throw new Error(err.message);
     }
   };
   return (

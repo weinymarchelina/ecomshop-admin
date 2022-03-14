@@ -35,7 +35,6 @@ const Contact = () => {
       });
 
       setUserList(usersData);
-      console.log(usersData);
     } catch (err) {
       console.log(err.message);
       console.log(err.response.data);
@@ -54,14 +53,11 @@ const Contact = () => {
 
  
     setUserList(newList);
-    console.log(newList)
-
     setSelectedName('')
     setSelectedUser({})
   };
 
   const handleSave = async () => {
-      console.log(userList)
     try {
         await axios.post("/api/data/contact", userList);
         router.push('/order')
@@ -206,7 +202,6 @@ const Contact = () => {
                 variant="contained"
                 onClick={(e) => {
                   e.target.disabled = true;
-                  console.log(e.target.disabled);
                   handleSave()
                 }}
               >

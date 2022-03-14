@@ -71,7 +71,8 @@ const AddProduct = ({ user }) => {
 
       setCategoryList(business.category);
     } catch (err) {
-      console.log(err.response?.data.msg);
+      console.log(err.message);
+      console.log(err.response?.data);
       throw new Error(err.message);
     }
   }, []);
@@ -79,7 +80,6 @@ const AddProduct = ({ user }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     e.target.disabled = true;
-    console.log(e.target.disabled);
 
     if (imgPath.length === 0) {
       setImgError("Please upload an image");
@@ -105,13 +105,10 @@ const AddProduct = ({ user }) => {
         formData
       );
 
-      console.log("Howdy 3");
-
       return await res.data.secure_url;
     });
 
     axios.all(imgLinks).then(async (image) => {
-      console.log(image);
       const product = {
         name,
         category,
@@ -124,8 +121,6 @@ const AddProduct = ({ user }) => {
         businessId: user.businessId,
         soldQty: 0,
       };
-
-      console.log(product);
 
       try {
         await axios.post("/api/products/add", product);
@@ -144,6 +139,7 @@ const AddProduct = ({ user }) => {
         router.push("/products");
       } catch (err) {
         console.log(err.response?.data);
+        console.log(err.message);
         throw new Error(err.message);
       }
     });
@@ -153,8 +149,6 @@ const AddProduct = ({ user }) => {
     const sameQty = priceList.filter((tag) => {
       return tag.minOrder === Number(minOrder);
     });
-
-    console.log(sameQty);
 
     if (sameQty.length > 0) {
       setError("Please input different order quantity");
@@ -195,16 +189,13 @@ const AddProduct = ({ user }) => {
 
         reader.readAsDataURL(obj.file);
       }
-      console.log(newPath);
       setImgPath(newPath);
       return;
     }
-    console.log(event.target.files);
 
     const counter = imgPath.length;
 
     for (const file of event.target.files) {
-      console.log(file);
       counter++;
       if (counter > 6) {
         setImgError("You can only upload maximum 6 images");
@@ -232,11 +223,9 @@ const AddProduct = ({ user }) => {
   };
 
   const moveImg = (old_index, new_index) => {
-    console.log(old_index, new_index);
     if (new_index === imgPath.length) {
       new_index = 0;
     }
-    console.log(old_index, new_index);
     while (old_index < 0) {
       old_index += imgPath.length;
     }

@@ -35,7 +35,6 @@ const QuickEdit = ({ user }) => {
       });
 
       setProducts(productData);
-      console.log(productData);
     } catch (err) {
       console.log(err.message);
       console.log(err.response.data);
@@ -44,8 +43,6 @@ const QuickEdit = ({ user }) => {
   }, []);
 
   const handleSave = async () => {
-    console.log(products);
-
     const newProducts = products.map((item) => {
       if (isNaN(item.stockQty)) {
         item.stockQty = 0;
@@ -68,12 +65,9 @@ const QuickEdit = ({ user }) => {
     filterProducts = products.filter((product) =>
       product.name.toLowerCase().includes(searchTerm)
     );
-    console.log(searchTerm);
   } else {
     filterProducts = products;
   }
-
-  console.log(filterProducts);
 
   return (
     <Container
@@ -229,7 +223,6 @@ const QuickEdit = ({ user }) => {
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        console.log(product.stockQty);
 
                         const newProducts = products.map((item) => {
                           if (item._id === product._id) {
@@ -237,7 +230,6 @@ const QuickEdit = ({ user }) => {
                           }
                           return item;
                         });
-                        console.log(newProducts);
                         setProducts(newProducts);
                       }}
                     >
@@ -262,7 +254,6 @@ const QuickEdit = ({ user }) => {
                 variant="contained"
                 onClick={(e) => {
                   e.target.disabled = true;
-                  console.log(e.target.disabled);
                   handleSave();
                 }}
               >

@@ -108,7 +108,6 @@ const EmployeeList = (propsRole) => {
                 }}
                 onClick={(e) => {
                   e.target.disabled = true;
-                  console.log(e.target.disabled);
                 }}
                 type="submit"
               >

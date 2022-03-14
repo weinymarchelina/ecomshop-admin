@@ -14,8 +14,6 @@ const addProduct = async (req, res) => {
     if (!session) return res.status(400).json({ msg: "Please login first." });
 
     const product = await new Product(req.body).save();
-    console.log("Product: ");
-    console.log(product);
 
     res.status(200).json({
       msg: `A new product has been created`,

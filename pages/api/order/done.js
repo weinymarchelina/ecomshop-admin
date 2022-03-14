@@ -17,8 +17,6 @@ const finishOrder = async (req, res) => {
 
     const { order, done } = req.body;
 
-    // const theOrder = await Order.findById(orderId);
-
     let finishDate;
     if (done) {
       finishDate = new Date().toISOString();
@@ -26,28 +24,20 @@ const finishOrder = async (req, res) => {
       finishDate = "-";
     }
 
-    const result = await Order.updateOne(
+    await Order.updateOne(
       { _id: order._id },
       {
         doneStatus: true,
         finishDate,
       }
     );
-    console.log(result);
 
     for (const item of order.itemList) {
       const product = await Product.findOne({
         _id: item.productId,
       });
-      console.log(product);
 
       if (finishDate !== "-") {
-        console.log("Finish order");
-        console.log(
-          `${product.name}: from ${product.soldQty} to ${
-            product.soldQty + item.quantity
-          }`
-        );
         await Product.updateOne(
           { _id: item.productId },
           {
@@ -55,12 +45,6 @@ const finishOrder = async (req, res) => {
           }
         );
       } else {
-        console.log("Order has been canceled");
-        console.log(
-          `${product.name}: from ${product.stockQty} to ${
-            product.stockQty + item.quantity
-          }`
-        );
         await Product.updateOne(
           { _id: item.productId },
           {

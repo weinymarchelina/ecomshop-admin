@@ -58,7 +58,6 @@ const PasswordChecker = ({ props }) => {
               }}
               onClick={(e) => {
                 e.target.disabled = true;
-                console.log(e.target.disabled);
                 handle();
               }}
             >

@@ -97,27 +97,22 @@ const OrderList = ({ user }) => {
         }
       }
 
-      console.log(orderData);
-
       setOrders(orderData);
     } catch (err) {
       console.log(err.message);
+      console.log(err.response.data);
       throw new Error(err.message);
     }
   }, []);
 
   const searchOrder = () => {
-    // console.log(searchTerm);
     if (searchTerm) {
       const getOrders = orders.filter((order) => {
         const name = order.customName ? order.customName : order.customName;
 
-        console.log(name.toLowerCase().includes(searchTerm));
         return name.toLowerCase().includes(searchTerm);
       });
 
-      // console.log("Test");
-      // console.log(getOrders);
       return getOrders;
     } else if (filter === "All") return orders;
     else return orders;
@@ -127,9 +122,7 @@ const OrderList = ({ user }) => {
 
   const filterOrders = () => {
     let filteredOrders;
-    console.log("filtered");
-    console.log(searchedOrder);
-    console.log(filter);
+
     if (filter !== "All") {
       switch (filter) {
         case "Unfinished":
@@ -148,7 +141,6 @@ const OrderList = ({ user }) => {
           filteredOrders = searchedOrder.filter(
             (order) => order.doneStatus && order.finishDate === "-"
           );
-          console.log(filteredOrders);
           break;
 
         case "Today":
@@ -231,14 +223,11 @@ const OrderList = ({ user }) => {
   };
 
   const handleCancel = async (order) => {
-    console.log("Cancel!");
     try {
-      const res = await axios.post("/api/order/done", {
+      await axios.post("/api/order/done", {
         order,
         done: false,
       });
-      const { msg } = res.data;
-      console.log(msg);
       window.location.reload();
     } catch (err) {
       console.log(err.message);
@@ -248,14 +237,12 @@ const OrderList = ({ user }) => {
   };
 
   const handleFinish = async (order) => {
-    console.log("Finish");
     try {
       const res = await axios.post("/api/order/done", {
         order,
         done: true,
       });
       const { msg } = res.data;
-      console.log(msg);
       window.location.reload();
     } catch (err) {
       console.log(err.message);
@@ -361,7 +348,6 @@ const OrderList = ({ user }) => {
                         sx={{ mr: 1 }}
                         onClick={(e) => {
                           e.target.disabled = true;
-                          console.log(e.target.disabled);
                           action.func(action.order);
                         }}
                       >
@@ -504,7 +490,6 @@ const OrderList = ({ user }) => {
                                     px: 1,
                                     py: 0.5,
                                     borderRadius: "0.35vw",
-                                    // backgroundColor: getColor(order),
                                   }}
                                   style={getStyle(order)}
                                 >
@@ -548,7 +533,6 @@ const OrderList = ({ user }) => {
                                         func: handleCancel,
                                         order,
                                       });
-                                      // handleCancel(order);
                                     }}
                                     variant="outlined"
                                   >
