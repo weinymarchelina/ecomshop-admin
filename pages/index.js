@@ -28,21 +28,21 @@ export default function Home({ user }) {
         <Card variant="outlined" sx={{ width: "100%" }}>
           <CardContent sx={{ p: 5, textAlign: "center" }} className="f-column">
             <Typography
-              sx={{ lineHeight: "100%", mb: 3 }}
+              sx={{ lineHeight: "115%", mb: 3 }}
               className="main-title"
-              variant="h3"
+              variant={matches ? "h4" : "h3"}
               component="h1"
               gutterBottom
             >
-              Set Your Role
+              Super One Acc Admin Site
             </Typography>
 
             <Typography
               sx={{ lineHeight: "125%" }}
-              variant="h6"
+              variant={matches ? "h6" : "h5"}
               component="p"
               gutterBottom
-            >{`Welcome new user, let's set your role to sign in!`}</Typography>
+            >{`Let's set your role to sign in!`}</Typography>
 
             <img
               className="svg-login"

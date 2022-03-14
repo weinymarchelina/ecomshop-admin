@@ -253,22 +253,30 @@ const DisplayReport = ({ user }) => {
                     className="main-title"
                   >
                     {isMain && "Total"}
+                    {!isMain && "Most Order"}
                     {!isMain &&
-                      `Most Order (${customer.best[0].totalOrder} ${
-                        customer.best[0].totalOrder <= 1 ? "order" : "orders"
+                      customer.best[0] &&
+                      ` (${customer.best[0]?.totalOrder} ${
+                        customer.best[0]?.totalOrder <= 1 ? "order" : "orders"
                       })`}
                   </Typography>
 
-                  <Typography
-                    variant={stacks ? "caption" : "body1"}
-                    textAlign="right"
-                    component="p"
-                  >
-                    {isMain && formatter.format(total.subtotal)}
-                    {!isMain &&
-                      customer.best.map((user) => {
+                  {isMain && (
+                    <Typography
+                      variant={stacks ? "caption" : "body1"}
+                      textAlign="right"
+                      component="p"
+                    >
+                      {formatter.format(total.subtotal)}
+                    </Typography>
+                  )}
+
+                  {!isMain && (
+                    <Box>
+                      {customer.best.map((user) => {
                         return (
                           <Typography
+                            key={user.userId}
                             variant={stacks ? "caption" : "body1"}
                             component="p"
                           >
@@ -276,7 +284,8 @@ const DisplayReport = ({ user }) => {
                           </Typography>
                         );
                       })}
-                  </Typography>
+                    </Box>
+                  )}
                 </Card>
                 <Card
                   variant="outlined"
@@ -297,10 +306,11 @@ const DisplayReport = ({ user }) => {
                     className="main-title"
                   >
                     {isMain && "Sold Items"}
+                    {!isMain && `Most Spending `}
+
                     {!isMain &&
-                      `Most Spending (${formatter.format(
-                        customer.most.totalPaid
-                      )})`}
+                      customer.most &&
+                      `(${formatter.format(customer.most?.totalPaid)})`}
                   </Typography>
 
                   <Typography
@@ -310,10 +320,11 @@ const DisplayReport = ({ user }) => {
                   >
                     {isMain && `${total.soldItem} pcs`}
                     {!isMain &&
+                      customer.most &&
                       `${
-                        customer.most.accName !== ""
-                          ? customer.most.accName
-                          : customer.most.name
+                        customer.most?.accName !== ""
+                          ? customer.most?.accName
+                          : customer.most?.name
                       }`}
                   </Typography>
                 </Card>
@@ -337,8 +348,10 @@ const DisplayReport = ({ user }) => {
                     className="main-title"
                   >
                     {isMain && "Sold Products"}
+                    {!isMain && "Most Items "}
                     {!isMain &&
-                      "Most Items" + ` (${customer.items.totalQty} items)`}
+                      customer.items &&
+                      `(${customer.items?.totalQty} items)`}
                   </Typography>
 
                   <Typography
@@ -353,10 +366,11 @@ const DisplayReport = ({ user }) => {
                       </>
                     )}
                     {!isMain &&
+                      customer.items &&
                       `${
-                        customer.items.accName !== ""
-                          ? customer.items.accName
-                          : customer.items.name
+                        customer.items?.accName !== ""
+                          ? customer.items?.accName
+                          : customer.items?.name
                       }`}
                   </Typography>
                 </Card>

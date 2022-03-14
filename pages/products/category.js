@@ -108,8 +108,8 @@ const BusinessCategory = ({ user }) => {
       maxWidth={matches ? "sm" : "lg"}
     >
       {categoryList && (
-        <Card className="f-row" variant="outlined" size="small">
-          <CardContent className="f-col" sx={{ px: 5, width: "100%" }}>
+        <Box className="f-row" variant="outlined" size="small">
+          <Box className="f-col" sx={{ px: 5, width: "100%" }}>
             <Box
               className="f-space"
               sx={{
@@ -118,14 +118,18 @@ const BusinessCategory = ({ user }) => {
                 alignItems: "center",
               }}
             >
-              <Typography className="main-title" variant="h5" component="h2">
+              <Typography
+                className="main-title"
+                variant={matches ? "h5" : "h4"}
+                component="h2"
+              >
                 Category List
               </Typography>
             </Box>
             <Box
               className="f-space"
               style={{
-                border: `${matches ? "none" : "1px solid #ddd"}`,
+                border: "1px solid #ddd",
                 borderRadius: ".5vw",
               }}
               sx={{
@@ -145,6 +149,7 @@ const BusinessCategory = ({ user }) => {
                 variant="standard"
                 fullWidth
                 autoComplete="off"
+                size={matches ? "small" : "medium"}
               />
               <Button onClick={addCategory} variant="contained" size="small">
                 Add
@@ -158,7 +163,7 @@ const BusinessCategory = ({ user }) => {
                 <ErrorWarning error={error} />
               </Box>
             )}
-            <List>
+            <List sx={{ mb: 3 }}>
               {categoryList.map((category) => (
                 <ListItem
                   key={category.name}
@@ -218,8 +223,8 @@ const BusinessCategory = ({ user }) => {
                 Cancel
               </Button>
             </Box>
-          </CardContent>
-        </Card>
+          </Box>
+        </Box>
       )}
     </Container>
   );

@@ -475,7 +475,7 @@ const EditProduct = ({ user }) => {
               }}
             >
               <TextField
-                label="Stock Quantity"
+                label="Quantity"
                 type="number"
                 value={stockQty}
                 onChange={(e) => setStockQty(e.target.value.toString())}
@@ -488,7 +488,7 @@ const EditProduct = ({ user }) => {
               />
 
               <TextField
-                label="Stock Warning Quantity"
+                label="Warning Quantity"
                 type="number"
                 value={warningQty}
                 onChange={(e) => setWarningQty(e.target.value.toString())}
@@ -631,20 +631,40 @@ const EditProduct = ({ user }) => {
                 })}
               </List>
             )}
-            <Button
+            <Box
               sx={{
-                px: 3,
-                py: 1,
-                mt: 5,
-                alignSelf: `${stacks ? "center" : "flex-end"}`,
+                alignSelf: "flex-end",
                 width: `${stacks ? "100%" : "auto"}`,
               }}
-              size="large"
-              type="submit"
-              variant="contained"
+              className={stacks ? "f-col" : "f-row"}
             >
-              Edit
-            </Button>
+              <Button
+                sx={{
+                  px: 3,
+                  py: 1,
+                  mt: 5,
+                  alignSelf: `${stacks ? "center" : "flex-end"}`,
+                  width: `${stacks ? "100%" : "auto"}`,
+                }}
+                type="submit"
+                variant="contained"
+              >
+                Edit
+              </Button>
+              <Button
+                sx={{
+                  px: 3,
+                  py: 1,
+                  alignSelf: `${stacks ? "center" : "flex-end"}`,
+                  width: `${stacks ? "100%" : "auto"}`,
+                }}
+                style={{ marginLeft: `${stacks ? "0" : ".5rem"}` }}
+                variant="outlined"
+                onClick={() => router.push("/products")}
+              >
+                Back
+              </Button>
+            </Box>
           </form>
         </Box>
       </Box>

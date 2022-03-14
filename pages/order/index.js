@@ -19,8 +19,6 @@ import { getSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import moment from "moment";
-import { SettingsApplications } from "@mui/icons-material";
-import AccountBoxIcon from "@mui/icons-material/AccountBox";
 
 // const idLocale = require("moment/locale/id");
 // moment.locale("id", idLocale);
@@ -290,9 +288,6 @@ const OrderList = ({ user }) => {
                     className="f-space"
                     sx={{ flex: 2, gap: 3, width: "100%" }}
                   >
-                    {/* <IconButton>
-                      <AccountBoxIcon />
-                    </IconButton> */}
                     <FormControl variant="standard" sx={{ flex: 1 }}>
                       <InputLabel>Filter</InputLabel>
                       <Select

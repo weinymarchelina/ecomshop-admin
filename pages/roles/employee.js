@@ -70,13 +70,13 @@ const Employee = ({ user }) => {
               gutterBottom
               textAlign={"center"}
             >
-              {`Join to your business' account`}{" "}
+              {`Join business account`}{" "}
             </Typography>
 
             <form autoComplete="off" onSubmit={handleSubmit}>
               <FormControl fullWidth>
                 <TextField
-                  label="Business' Email"
+                  label="Business Email"
                   variant="standard"
                   sx={{ mb: 4 }}
                   fullWidth

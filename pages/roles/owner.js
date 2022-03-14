@@ -66,12 +66,12 @@ const Owner = ({ user }) => {
               sx={{ mb: 3 }}
               gutterBottom
             >
-              Business Form
+              Register Business
             </Typography>
             <form autoComplete="off" onSubmit={handleSubmit}>
               <FormControl fullWidth>
                 <TextField
-                  label="Business's Name"
+                  label="Business Name"
                   variant="standard"
                   sx={{ mb: 4 }}
                   fullWidth
@@ -83,24 +83,24 @@ const Owner = ({ user }) => {
                 />
 
                 <TextField
-                  label="Phone Number"
+                  label="Business Email"
                   fullWidth
                   rows={1}
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   sx={{ mb: 4 }}
                   variant="standard"
                   required
                 />
 
                 <TextField
-                  label="Email"
+                  label="Phone Number"
                   fullWidth
                   rows={1}
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                   sx={{ mb: 4 }}
                   variant="standard"
                   required

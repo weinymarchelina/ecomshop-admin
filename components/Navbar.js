@@ -33,22 +33,27 @@ const Navbar = () => {
   return (
     <AppBar className="nav-container" sx={{ px: 2 }} position="static">
       <Container maxWidth="xxl">
-        <Toolbar disableGutters>
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+        <Toolbar className="f-space" disableGutters>
+          <Box
+            sx={{
+              width: { xs: "30px" },
+              cursor: "pointer",
+              "&:hover": {
+                opacity: 0.85,
+              },
+            }}
+            onClick={() => router.push("/")}
+          >
             LOGO
+            {/* <img style={{ width: "100%" }} src="/icon.png" /> */}
           </Box>
 
           <Box
             sx={{
-              flexGrow: 1,
               display: { xs: "flex", md: "none" },
               alignItems: "center",
             }}
           >
-            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-              LOGO
-            </Box>
-
             {session && (
               <Box>
                 <IconButton
@@ -102,12 +107,6 @@ const Navbar = () => {
                 </Typography>
               ))}
             </Box>
-          )}
-
-          {!session && router.pathname === "/" && (
-            <Button variant="outlined" color="secondary">
-              <Link href="/">Set Roles</Link>
-            </Button>
           )}
         </Toolbar>
       </Container>

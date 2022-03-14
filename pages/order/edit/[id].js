@@ -541,23 +541,23 @@ const EditOrder = ({ user }) => {
                     {subtotal}
                   </Typography>
                 </Card>
+
                 {(order.doneStatus && order.finishDate === "-") || (
                   <Box
                     sx={{
-                      display: "flex",
-                      mt: 3,
-                      gap: 1,
-                      justifyContent: "flex-end",
+                      alignSelf: "flex-end",
+                      width: `${stacks ? "100%" : "auto"}`,
                     }}
+                    className={stacks ? "f-col" : "f-row"}
                   >
                     <Button
-                      size="small"
-                      onClick={() => router.push("/order")}
-                      variant="outlined"
-                    >
-                      Back
-                    </Button>
-                    <Button
+                      sx={{
+                        px: 3,
+                        py: 1,
+                        mt: 5,
+                        alignSelf: `${stacks ? "center" : "flex-end"}`,
+                        width: `${stacks ? "100%" : "auto"}`,
+                      }}
                       size="small"
                       variant="contained"
                       onClick={(e) => {
@@ -566,6 +566,19 @@ const EditOrder = ({ user }) => {
                       }}
                     >
                       Save
+                    </Button>
+                    <Button
+                      sx={{
+                        px: 3,
+                        py: 1,
+                        alignSelf: `${stacks ? "center" : "flex-end"}`,
+                        width: `${stacks ? "100%" : "auto"}`,
+                      }}
+                      style={{ marginLeft: `${stacks ? "0" : ".5rem"}` }}
+                      variant="outlined"
+                      onClick={() => router.push("/products")}
+                    >
+                      Back
                     </Button>
                   </Box>
                 )}

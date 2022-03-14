@@ -76,6 +76,9 @@ const Settings = ({ user }) => {
         signOut({ callbackUrl: `${window.location.origin}/` });
       }
 
+      setName(businessData.name);
+      setEmail(businessData.email);
+      setPhone(businessData.phone);
       setBusiness(businessData);
       setPromoted(promoted);
     } catch (err) {
@@ -296,7 +299,7 @@ const Settings = ({ user }) => {
   return (
     <Container
       sx={{
-        py: 5,
+        py: 6,
       }}
       maxWidth={matches ? "sm" : "lg"}
     >
@@ -391,8 +394,8 @@ const Settings = ({ user }) => {
             <Box sx={modalStyle} className="f-col">
               <Typography variant="h6" component="p">
                 Congratulations! You have been promoted as the new owner of{" "}
-                {business.name}! Please sign out to change your role into the
-                owner.{" "}
+                {business.name}! Please sign out then sign in again to change
+                your role into the owner.{" "}
               </Typography>
               <Button
                 sx={{
@@ -484,23 +487,23 @@ const Settings = ({ user }) => {
                           />
 
                           <TextField
-                            label="New Phone Number"
-                            fullWidth
-                            rows={1}
-                            type="tel"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            sx={{ mb: 4 }}
-                            variant="standard"
-                          />
-
-                          <TextField
                             label="New Email"
                             fullWidth
                             rows={1}
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            sx={{ mb: 4 }}
+                            variant="standard"
+                          />
+
+                          <TextField
+                            label="New Phone Number"
+                            fullWidth
+                            rows={1}
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
                             sx={{ mb: 4 }}
                             variant="standard"
                           />
@@ -705,19 +708,7 @@ const Settings = ({ user }) => {
                   <Typography sx={{ fontWeight: 600 }}>Name</Typography>
                   <Typography>{business.name}</Typography>
                 </Box>
-                <Box
-                  sx={{
-                    borderBottom: 1,
-                    borderColor: "text.secondary",
-                    px: 1,
-                    pb: 1,
-                    mb: 3,
-                  }}
-                  className={matches ? "f-col" : "f-space"}
-                >
-                  <Typography sx={{ fontWeight: 600 }}>Phone Number</Typography>
-                  <Typography>{business.phone}</Typography>
-                </Box>
+
                 <Box
                   sx={{
                     borderBottom: 1,
@@ -730,6 +721,19 @@ const Settings = ({ user }) => {
                 >
                   <Typography sx={{ fontWeight: 600 }}>Email</Typography>
                   <Typography>{business.email}</Typography>
+                </Box>
+                <Box
+                  sx={{
+                    borderBottom: 1,
+                    borderColor: "text.secondary",
+                    px: 1,
+                    pb: 1,
+                    mb: 3,
+                  }}
+                  className={matches ? "f-col" : "f-space"}
+                >
+                  <Typography sx={{ fontWeight: 600 }}>Phone Number</Typography>
+                  <Typography>{business.phone}</Typography>
                 </Box>
                 <Box
                   sx={{

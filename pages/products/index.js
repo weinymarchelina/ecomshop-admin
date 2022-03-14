@@ -182,7 +182,8 @@ const Product = ({ user }) => {
   };
   const finalProducts = sortProducts();
 
-  const handleDelete = async () => {
+  const handleDelete = async (e) => {
+    e.stopPropagation();
     try {
       await axios.post("/api/products/delete", {
         selectedProduct,
@@ -319,7 +320,7 @@ const Product = ({ user }) => {
                             component="p"
                             sx={{ my: 3 }}
                           >
-                            Edit the active status first
+                            Edit the product's active status
                           </Typography>
                           <Button
                             variant="contained"
@@ -370,7 +371,20 @@ const Product = ({ user }) => {
                 <Grid container spacing={3} sx={{ my: 1 }}>
                   {filteredProducts.map((product) => {
                     return (
-                      <Grid item xs={12} sm={6} md={4} key={product._id}>
+                      <Grid
+                        item
+                        xs={12}
+                        sm={6}
+                        md={4}
+                        key={product._id}
+                        onClick={() => router.push(`/products/${product._id}`)}
+                        sx={{
+                          cursor: "pointer",
+                          "&:hover": {
+                            opacity: 0.85,
+                          },
+                        }}
+                      >
                         <Card variant="outlined" sx={styleDecide(product)}>
                           <CardContent>
                             <Box sx={{ position: "relative" }}>
@@ -386,7 +400,10 @@ const Product = ({ user }) => {
                                 <IconButton
                                   size="small"
                                   sx={{ backgroundColor: "#eeeeee90", mr: 1 }}
-                                  onClick={() => handleEdit(product)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEdit(product);
+                                  }}
                                 >
                                   <EditIcon
                                     sx={{
@@ -404,7 +421,8 @@ const Product = ({ user }) => {
                                     backgroundColor: "#eeeeee90",
                                     mr: 1,
                                   }}
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.stopPropagation();
                                     setSelectedProduct(product), setOpen(true);
                                   }}
                                 >
@@ -493,6 +511,7 @@ const Product = ({ user }) => {
                                   sx={{ textTransform: "uppercase" }}
                                   variant="caption"
                                   component="p"
+                                  textAlign="right"
                                 >
                                   {product.category.name}
                                 </Typography>

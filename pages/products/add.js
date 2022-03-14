@@ -646,20 +646,41 @@ const AddProduct = ({ user }) => {
                 })}
               </List>
             )}
-            <Button
+            <Box
               sx={{
-                px: 3,
-                py: 1,
-                mt: 5,
-                alignSelf: `${stacks ? "center" : "flex-end"}`,
+                alignSelf: "flex-end",
                 width: `${stacks ? "100%" : "auto"}`,
               }}
-              size="large"
-              type="submit"
-              variant="contained"
+              className={stacks ? "f-col" : "f-row"}
             >
-              Add
-            </Button>
+              <Button
+                sx={{
+                  px: 3,
+                  py: 1,
+                  mt: 5,
+                  alignSelf: `${stacks ? "center" : "flex-end"}`,
+                  width: `${stacks ? "100%" : "auto"}`,
+                }}
+                size="large"
+                type="submit"
+                variant="contained"
+              >
+                Add
+              </Button>
+              <Button
+                sx={{
+                  px: 3,
+                  py: 1,
+                  alignSelf: `${stacks ? "center" : "flex-end"}`,
+                  width: `${stacks ? "100%" : "auto"}`,
+                }}
+                style={{ marginLeft: `${stacks ? "0" : ".5rem"}` }}
+                variant="outlined"
+                onClick={() => router.push("/products")}
+              >
+                Back
+              </Button>
+            </Box>
           </form>
         </Box>
       </Box>
