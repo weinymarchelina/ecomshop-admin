@@ -291,6 +291,7 @@ const DisplayProduct = ({ user }) => {
                                 }`,
                               }}
                               src={img}
+                              alt={`${product.name} Image`}
                             />
                           </Box>
                         ))}

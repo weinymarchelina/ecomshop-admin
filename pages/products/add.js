@@ -468,7 +468,7 @@ const AddProduct = ({ user }) => {
                       </IconButton>
                       <img
                         src={pathItem.path}
-                        alt="Image"
+                        alt={`Image ${index + 1}`}
                         style={{ height: "100%" }}
                       />
                     </Grid>

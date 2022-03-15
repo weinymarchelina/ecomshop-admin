@@ -44,28 +44,37 @@ const Contact = () => {
 
   const handleRename = () => {
     const newList = userList.map((user) => {
-      if (user._id === selectedUser._id) {
-        user.contactInfo?.name = selectedName;
+      const findUser = user._id === selectedUser._id;
+      if (findUser) {
+        // user.contactInfo?.name = selectedName;
+
+        const newUser = {
+          ...user,
+          contactInfo: {
+            name: selectedName,
+          },
+        };
+        // console.log(newUser);
+        return newUser;
       }
 
       return user;
     });
 
- 
     setUserList(newList);
-    setSelectedName('')
-    setSelectedUser({})
+    setSelectedName("");
+    setSelectedUser({});
   };
 
   const handleSave = async () => {
     try {
-        await axios.post("/api/data/contact", userList);
-        router.push('/order')
-      } catch (err) {
-        console.log(err.response.data);
-        console.log(err.message);
-        throw new Error(err.message);
-      }
+      await axios.post("/api/data/contact", userList);
+      router.push("/order");
+    } catch (err) {
+      console.log(err.response.data);
+      console.log(err.message);
+      throw new Error(err.message);
+    }
   };
 
   return (
@@ -86,7 +95,11 @@ const Contact = () => {
                 alignItems: "center",
               }}
             >
-              <Typography className="main-title" variant={matches ? "h5" : "h4"} component="h2">
+              <Typography
+                className="main-title"
+                variant={matches ? "h5" : "h4"}
+                component="h2"
+              >
                 Contact List
               </Typography>
             </Box>
@@ -120,7 +133,7 @@ const Contact = () => {
                 fullWidth
                 autoComplete="off"
                 required
-                size={matches ? 'small' : 'medium'}
+                size={matches ? "small" : "medium"}
               />
               <Button
                 disabled={selectedUser?._id ? false : true}
@@ -132,7 +145,6 @@ const Contact = () => {
               </Button>
             </Box>
 
-         
             <List sx={{ mb: 3 }}>
               {userList.map((user) => (
                 <ListItem
@@ -172,12 +184,12 @@ const Contact = () => {
                   <ListItemButton
                     sx={{ px: 1, flex: 1 }}
                     onClick={() => {
-                        setSelectedName('')
-                        setSelectedUser(user)
+                      setSelectedName("");
+                      setSelectedUser(user);
 
-                        if (user.contactInfo.name) {
-                            setSelectedName(user.contactInfo.name)
-                        }
+                      if (user.contactInfo.name) {
+                        setSelectedName(user.contactInfo.name);
+                      }
                     }}
                   >
                     <EditIcon
@@ -202,7 +214,7 @@ const Contact = () => {
                 variant="contained"
                 onClick={(e) => {
                   e.target.disabled = true;
-                  handleSave()
+                  handleSave();
                 }}
               >
                 Save

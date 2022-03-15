@@ -46,7 +46,11 @@ const Navbar = () => {
             }}
             onClick={() => router.push("/order")}
           >
-            <img style={{ width: "100%" }} src="/icon.png" />
+            <img
+              style={{ width: "100%" }}
+              src="/icon.png"
+              alt="ecomshop-icon"
+            />
             <Typography
               sx={{
                 letterSpacing: "1.25px",

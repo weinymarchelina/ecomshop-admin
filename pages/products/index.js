@@ -319,7 +319,7 @@ const Product = ({ user }) => {
                             component="p"
                             sx={{ my: 3 }}
                           >
-                            Edit the product's active status
+                            {`Edit the product's active status`}
                           </Typography>
                           <Button
                             variant="contained"
