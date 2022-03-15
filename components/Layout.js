@@ -5,10 +5,10 @@ const Layout = ({ children }) => {
   return (
     <div className="content">
       <Head>
-        <title>Super One Acc | Admin Site</title>
+        <title>Ecomshop | Admin Site</title>
         <meta
           name="description"
-          content="Admin site for Super One Accessories"
+          content="Admin site for your ecommerce website"
         />
         <link rel="icon" href="/icon.png" />
       </Head>

@@ -22,6 +22,7 @@ const EmployeeList = (propsRole) => {
     setError,
     password,
     setPassword,
+    handleRole,
   } = propsRole.props;
 
   return (
@@ -106,10 +107,15 @@ const EmployeeList = (propsRole) => {
                   fontSize: `${matches ? "calc(0.35rem + 1vw)" : ""}`,
                   padding: `${matches ? " 0.35rem" : ""}`,
                 }}
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.target.disabled = true;
+                  const error = await handleRole();
+
+                  if (error) {
+                    e.target.disabled = false;
+                  }
                 }}
-                type="submit"
+                // type="submit"
               >
                 Change
               </Button>

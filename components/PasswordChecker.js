@@ -56,9 +56,13 @@ const PasswordChecker = ({ props }) => {
                 fontSize: `${matches ? "calc(0.35rem + 1vw)" : ""}`,
                 padding: `${matches ? " 0.35rem" : ""}`,
               }}
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.target.disabled = true;
-                handle();
+
+                const error = await handle();
+                if (error) {
+                  e.target.disabled = false;
+                }
               }}
             >
               {action}

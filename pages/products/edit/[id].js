@@ -139,7 +139,8 @@ const EditProduct = ({ user }) => {
 
       const formData = new FormData();
       formData.append("file", imgObj.file);
-      formData.append("upload_preset", "superoneaccdebest");
+      // formData.append("upload_preset", "superoneaccdebest");
+      formData.append("upload_preset", "ecomshop");
 
       const res = await axios.post(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_API_CLOUD_NAME}/image/upload`,
@@ -440,8 +441,10 @@ const EditProduct = ({ user }) => {
                         sx={{
                           position: "absolute",
                           right: 0,
-                          mt: 0.25,
+                          m: 1,
                           letterSpacing: "1.5px",
+                          p: 0.35,
+                          backgroundColor: "#eeeeee80",
                         }}
                       >
                         <DeleteIcon color="primary" />
@@ -488,7 +491,7 @@ const EditProduct = ({ user }) => {
               />
 
               <TextField
-                label="Warning Quantity"
+                label="Trigger Warning Quantity"
                 type="number"
                 value={warningQty}
                 onChange={(e) => setWarningQty(e.target.value.toString())}
@@ -528,7 +531,7 @@ const EditProduct = ({ user }) => {
                 variant="standard"
                 sx={{ width: `${matches ? "100%" : "35%"}`, my: 2 }}
               >
-                <InputLabel>Price</InputLabel>
+                <InputLabel>Price for Each Product</InputLabel>
                 <Input
                   variant="outlined"
                   type="number"
@@ -591,7 +594,7 @@ const EditProduct = ({ user }) => {
                   variant="h7"
                   component="p"
                 >
-                  Price List
+                  Price List for Each Product
                 </Typography>
                 {priceList.map((list) => {
                   return (
@@ -610,8 +613,10 @@ const EditProduct = ({ user }) => {
                           letterSpacing: `${matches ? "0" : "1px"}`,
                         }}
                       >
-                        {formatter.format(list.price)} for{" "}
-                        {qtyFormatter.format(list.minOrder)} pcs
+                        {formatter.format(list.price)}{" "}
+                        {`(min. ${qtyFormatter.format(list.minOrder)} ${
+                          list.minOrder === 1 ? "item" : "items"
+                        })`}
                       </Typography>
                       <ListItemButton
                         sx={{ px: 1, flex: 1 }}

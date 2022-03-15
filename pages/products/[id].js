@@ -372,6 +372,38 @@ const DisplayProduct = ({ user }) => {
                           </Typography>
                         </Box>
 
+                        <Box sx={{ display: "flex", mb: 2, gap: 3 }}>
+                          <Box>
+                            <FormLabel>
+                              <Typography variant="subtitle1">
+                                Quantity
+                              </Typography>
+                            </FormLabel>
+                            <Typography
+                              sx={{ my: 1 }}
+                              variant="body1"
+                              component="p"
+                            >
+                              {product.stockQty} pcs
+                            </Typography>
+                          </Box>
+
+                          <Box>
+                            <FormLabel>
+                              <Typography variant="subtitle1">
+                                Trigger Warning Quantity
+                              </Typography>
+                            </FormLabel>
+                            <Typography
+                              sx={{ my: 1 }}
+                              variant="body1"
+                              component="p"
+                            >
+                              {product.warningQty} pcs
+                            </Typography>
+                          </Box>
+                        </Box>
+
                         <Box sx={{ mb: 2 }}>
                           <FormLabel>
                             <Typography variant="subtitle1">
@@ -407,6 +439,19 @@ const DisplayProduct = ({ user }) => {
                             </Typography>
                           </Box>
                         )}
+
+                        <Box sx={{ mb: 2 }}>
+                          <FormLabel>
+                            <Typography variant="subtitle1">Status</Typography>
+                          </FormLabel>
+                          <Typography
+                            sx={{ my: 1 }}
+                            variant="body1"
+                            component="p"
+                          >
+                            {product.activeStatus ? "Active" : "Inactive"}
+                          </Typography>
+                        </Box>
                       </Box>
                     </Box>
                   </Box>

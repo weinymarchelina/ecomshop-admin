@@ -182,8 +182,7 @@ const Product = ({ user }) => {
   };
   const finalProducts = sortProducts();
 
-  const handleDelete = async (e) => {
-    e.stopPropagation();
+  const handleDelete = async () => {
     try {
       await axios.post("/api/products/delete", {
         selectedProduct,
@@ -348,6 +347,8 @@ const Product = ({ user }) => {
                               variant="outlined"
                               sx={{ mr: 1 }}
                               onClick={(e) => {
+                                e.stopPropagation();
+
                                 e.target.disabled = true;
                                 console.log(e.target.disabled);
                                 handleDelete();

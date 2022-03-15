@@ -34,7 +34,7 @@ export default function Home({ user }) {
               component="h1"
               gutterBottom
             >
-              Super One Acc Admin Site
+              Ecomshop Admin Site
             </Typography>
 
             <Typography

@@ -98,7 +98,8 @@ const AddProduct = ({ user }) => {
     const imgLinks = imgPath.map(async (imgObj) => {
       const formData = new FormData();
       formData.append("file", imgObj.file);
-      formData.append("upload_preset", "superoneaccdebest");
+      // formData.append("upload_preset", "superoneaccdebest");
+      formData.append("upload_preset", "ecomshop");
 
       const res = await axios.post(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_API_CLOUD_NAME}/image/upload`,
@@ -457,7 +458,10 @@ const AddProduct = ({ user }) => {
                         sx={{
                           position: "absolute",
                           right: 0,
-                          mt: 0.25,
+                          m: 1,
+                          letterSpacing: "1.5px",
+                          p: 0.35,
+                          backgroundColor: "#eeeeee80",
                         }}
                       >
                         <DeleteIcon color="primary" />
@@ -491,7 +495,7 @@ const AddProduct = ({ user }) => {
               }}
             >
               <TextField
-                label="Stock Quantity"
+                label="Quantity"
                 type="number"
                 value={stockQty}
                 onChange={(e) => setStockQty(e.target.value)}
@@ -504,7 +508,7 @@ const AddProduct = ({ user }) => {
               />
 
               <TextField
-                label="Stock Warning Quantity"
+                label="Trigger Warning Quantity"
                 type="number"
                 value={warningQty}
                 onChange={(e) => setWarningQty(e.target.value)}
@@ -543,7 +547,7 @@ const AddProduct = ({ user }) => {
                 variant="standard"
                 sx={{ width: `${matches ? "100%" : "35%"}`, my: 2 }}
               >
-                <InputLabel>Price</InputLabel>
+                <InputLabel>Price for Each Product</InputLabel>
                 <Input
                   variant="outlined"
                   type="number"
@@ -606,7 +610,7 @@ const AddProduct = ({ user }) => {
                   variant="h7"
                   component="p"
                 >
-                  Price List
+                  Price List for Each Product
                 </Typography>
                 {priceList.map((list) => {
                   return (
@@ -625,8 +629,10 @@ const AddProduct = ({ user }) => {
                           letterSpacing: `${matches ? "0" : "1px"}`,
                         }}
                       >
-                        {formatter.format(list.price)} for{" "}
-                        {qtyFormatter.format(list.minOrder)} pcs
+                        {formatter.format(list.price)}{" "}
+                        {`(min. ${qtyFormatter.format(list.minOrder)} ${
+                          list.minOrder === 1 ? "item" : "items"
+                        })`}
                       </Typography>
                       <ListItemButton
                         sx={{ px: 1, flex: 1 }}

@@ -56,18 +56,6 @@ const Settings = ({ user }) => {
   const matches = useMediaQuery("(max-width:720px)");
   const stacks = useMediaQuery("(max-width:450px)");
 
-  const propsRole = {
-    matches,
-    business,
-    setChangeRole,
-    nextOwner,
-    setNextOwner,
-    error,
-    setError,
-    password,
-    setPassword,
-  };
-
   useEffect(async () => {
     try {
       const res = await axios.get("/api/data/business");
@@ -128,6 +116,7 @@ const Settings = ({ user }) => {
       setSuccessMsg(res.data.msg);
     } catch (err) {
       setPasswordError(err.response?.data.msg);
+      e.target.disabled = false;
 
       return;
     }
@@ -170,7 +159,10 @@ const Settings = ({ user }) => {
       setError(err.response?.data.msg);
       console.log(err.message);
       console.log(err.response?.data);
-      throw new Error(err.message);
+      e.target.disabled = false;
+      setName(name);
+      setEmail(email);
+      setPhone(phone);
     }
   };
 
@@ -183,11 +175,12 @@ const Settings = ({ user }) => {
         employeeEmail: wantKick.email,
       });
       window.location.reload();
+      return false;
     } catch (err) {
       console.log(err.message);
       console.log(err.response?.data);
       setError(err.response.data.msg);
-      return;
+      return true;
     }
   };
 
@@ -200,11 +193,12 @@ const Settings = ({ user }) => {
         employeeEmail: user.email,
       });
       signOut({ callbackUrl: `${window.location.origin}/` });
+      return false;
     } catch (err) {
       console.log(err.message);
       console.log(err.response?.data);
       setError(err.response.data.msg);
-      return;
+      return true;
     }
   };
 
@@ -215,21 +209,20 @@ const Settings = ({ user }) => {
         businessId,
       });
       signOut({ callbackUrl: `${window.location.origin}/` });
+      return false;
     } catch (err) {
       console.log(err.message);
       console.log(err.response?.data);
       setError(err.response.data.msg);
-      return;
+      return true;
     }
   };
 
-  const handleRole = async (e) => {
-    e.preventDefault();
-
+  const handleRole = async () => {
     setError(null);
     if (nextOwner == null) {
       setError("Please select an employee to be the next owner");
-      return;
+      return true;
     }
 
     try {
@@ -244,9 +237,10 @@ const Settings = ({ user }) => {
 
       signOut({ callbackUrl: `${window.location.origin}/` });
       window.location.reload();
+      return false;
     } catch (err) {
       setError(err.response.data.msg);
-      return;
+      return true;
     }
   };
 
@@ -256,6 +250,15 @@ const Settings = ({ user }) => {
     setPassword,
     error,
     setError,
+  };
+
+  const propsRole = {
+    ...propsBase,
+    business,
+    setChangeRole,
+    nextOwner,
+    setNextOwner,
+    handleRole,
   };
 
   const propsDelete = {

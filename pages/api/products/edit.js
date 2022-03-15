@@ -61,7 +61,6 @@ const editProduct = async (req, res) => {
 
     res.status(200).json({
       msg: `Product information has been successfully changed`,
-      res: response,
     });
   } catch (err) {
     return res.status(500).json({ msg: err.message });

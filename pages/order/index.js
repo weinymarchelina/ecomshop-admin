@@ -50,6 +50,7 @@ const startDayOfPrevWeek = moment(new Date()).startOf("week").format("lll");
 const lastDayOfPrevWeek = moment(new Date()).endOf("week").format("lll");
 const startDayOfMonth = moment(new Date()).startOf("month").format("lll");
 const lastDayOfMonth = moment(new Date()).endOf("month").format("lll");
+const today = moment(new Date()).format("MMM Do");
 
 const OrderList = ({ user }) => {
   const matches = useMediaQuery("(max-width:720px)");
@@ -63,7 +64,7 @@ const OrderList = ({ user }) => {
     "Unfinished",
     "Finished",
     "Canceled",
-    "Today",
+    `Today (${today})`,
     `This Week (${startDayWeek} - ${lastDayWeek})`,
     `This Month (${startDayMonth} - ${lastDayMonth})`,
   ];

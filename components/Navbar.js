@@ -36,16 +36,26 @@ const Navbar = () => {
         <Toolbar className="f-space" disableGutters>
           <Box
             sx={{
+              display: "flex",
+              alignItems: "flex-end",
               width: { xs: "30px" },
               cursor: "pointer",
               "&:hover": {
                 opacity: 0.85,
               },
             }}
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/order")}
           >
-            LOGO
-            {/* <img style={{ width: "100%" }} src="/icon.png" /> */}
+            <img style={{ width: "100%" }} src="/icon.png" />
+            <Typography
+              sx={{
+                letterSpacing: "1.25px",
+                display: { xs: "none", sm: "block" },
+                ml: 1,
+              }}
+            >
+              ECOMSHOP
+            </Typography>
           </Box>
 
           <Box
@@ -107,6 +117,23 @@ const Navbar = () => {
                 </Typography>
               ))}
             </Box>
+          )}
+
+          {!session && (
+            <>
+              <Button
+                onClick={() => {
+                  signIn(null, {
+                    callbackUrl: `${window.location.origin}/order`,
+                  });
+                }}
+                variant="outlined"
+                color="secondary"
+                sx={{ ml: 2 }}
+              >
+                Login
+              </Button>
+            </>
           )}
         </Toolbar>
       </Container>
