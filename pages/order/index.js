@@ -107,7 +107,7 @@ const OrderList = ({ user }) => {
   const searchOrder = () => {
     if (searchTerm) {
       const getOrders = orders.filter((order) => {
-        const name = order.customName ? order.customName : order.customName;
+        const name = order.customName ? order.customName : order.customerName;
 
         return name.toLowerCase().includes(searchTerm);
       });

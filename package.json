@@ -1,5 +1,5 @@
 {
-  "name": "superone-admin",
+  "name": "ecomshop-admin",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
